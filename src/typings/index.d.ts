@@ -4,5 +4,5 @@ declare module ptzUserApp {
 
 declare module "ptz-user-app"
 {
-    export = ptzUserDomain;
+    export = ptzUserApp;
 }

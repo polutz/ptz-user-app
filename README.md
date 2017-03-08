@@ -7,15 +7,23 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 
+## Polutz modules
+
+### Core
 Core Domain: https://github.com/polutz/ptz-core-domain
 
+Core Graphql: https://github.com/polutz/ptz-core-graphql
+
+### User
 User Domain: https://github.com/polutz/ptz-user-app
 
 User Repository: https://github.com/polutz/ptz-user-repository
 
 User App: https://github.com/polutz/ptz-user-app
 
+### Projects
 Projeto que utiliza os modulos acima: https://github.com/angeloocana/freecomclub
+
 
 Tarefas: https://trello.com/b/w9BqiPdz/frecom-club
 
