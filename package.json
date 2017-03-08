@@ -6,7 +6,7 @@
   "scripts": {
     "mocha": "mocha ./dist/**/*.js --compilers js:babel-core/register --require babel-polyfill",
     "pretest": "gulp js && node gensalt.js",
-    "test": "nyc npm run mocha && nyc report --reporter=text-lcov > coverage.lcov && codecov --token=7a80ed20-dee8-4343-83a9-8dc25398a34c"
+    "test": "nyc npm run mocha && nyc report --reporter=text-lcov > coverage.lcov && codecov --token=b1c7616b-9a84-436e-9329-50273c9d72db"
   },
   "repository": {
     "type": "git",
