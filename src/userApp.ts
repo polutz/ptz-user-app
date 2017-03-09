@@ -35,9 +35,9 @@ function UserApp(userRepository: IUserRepository): IUserApp {
             return Promise.resolve(user);
 
         if (isUpdate) {
-            var users = (await userRepository.getByIds([user.id]));
+            var usersFromDb = (await userRepository.getByIds([user.id]));
 
-            var userDb = new User(users[0]);
+            var userDb = new User(usersFromDb[0]);
             user = userDb.update(user);
         }
 

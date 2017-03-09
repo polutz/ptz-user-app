@@ -79,7 +79,7 @@ function UserApp(userRepository) {
     }
     function save(user) {
         return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
-            var isUpdate, otherUsers, users, userDb;
+            var isUpdate, otherUsers, usersFromDb, userDb;
             return regeneratorRuntime.wrap(function _callee2$(_context2) {
                 while (1) {
                     switch (_context2.prev = _context2.next) {
@@ -124,8 +124,8 @@ function UserApp(userRepository) {
                             return userRepository.getByIds([user.id]);
 
                         case 15:
-                            users = _context2.sent;
-                            userDb = new _ptzUserDomain.User(users[0]);
+                            usersFromDb = _context2.sent;
+                            userDb = new _ptzUserDomain.User(usersFromDb[0]);
 
                             user = userDb.update(user);
 
