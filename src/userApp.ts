@@ -1,4 +1,4 @@
-import {User} from 'ptz-user-domain';
+import { IUser, IUserRepository, IUserApp, User } from 'ptz-user-domain';
 import { hash, compare } from 'bcryptjs';
 import { encode, decode } from 'jwt-simple';
 
@@ -20,8 +20,6 @@ function UserApp(userRepository: IUserRepository): IUserApp {
     }
 
     async function save(user: IUser): Promise<IUser> {
-        var isUpdate = !!user.id;
-
         user = new User(user);
 
         user = await hashPassword(user);
@@ -34,9 +32,9 @@ function UserApp(userRepository: IUserRepository): IUserApp {
         if (user.otherUsersWithSameUserNameOrEmail(otherUsers))
             return Promise.resolve(user);
 
-        if (isUpdate) {
-            var usersFromDb = (await userRepository.getByIds([user.id]));
+        var usersFromDb: IUser[] = (await userRepository.getByIds([user.id]));
 
+        if (usersFromDb && usersFromDb.length > 0) {
             var userDb = new User(usersFromDb[0]);
             user = userDb.update(user);
         }
@@ -46,7 +44,7 @@ function UserApp(userRepository: IUserRepository): IUserApp {
         return Promise.resolve(user);
     }
 
-    function find(query, {limit}) {
+    function find(query, { limit }) {
         return userRepository.find(query, { limit });
     }
 

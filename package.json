@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/polutz/ptz-user-app#readme",
   "dependencies": {
-    "babel-loader": "^6.2.10",
     "bcryptjs": "^2.4.3",
     "dotenv": "^4.0.0",
     "jwt-simple": "^0.5.1",

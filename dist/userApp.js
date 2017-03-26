@@ -79,65 +79,59 @@ function UserApp(userRepository) {
     }
     function save(user) {
         return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
-            var isUpdate, otherUsers, usersFromDb, userDb;
+            var otherUsers, usersFromDb, userDb;
             return regeneratorRuntime.wrap(function _callee2$(_context2) {
                 while (1) {
                     switch (_context2.prev = _context2.next) {
                         case 0:
-                            isUpdate = !!user.id;
-
                             user = new _ptzUserDomain.User(user);
-                            _context2.next = 4;
+                            _context2.next = 3;
                             return hashPassword(user);
 
-                        case 4:
+                        case 3:
                             user = _context2.sent;
 
                             if (user.isValid()) {
-                                _context2.next = 7;
+                                _context2.next = 6;
                                 break;
                             }
 
                             return _context2.abrupt('return', Promise.resolve(user));
 
-                        case 7:
-                            _context2.next = 9;
+                        case 6:
+                            _context2.next = 8;
                             return userRepository.getOtherUsersWithSameUserNameOrEmail(user);
 
-                        case 9:
+                        case 8:
                             otherUsers = _context2.sent;
 
                             if (!user.otherUsersWithSameUserNameOrEmail(otherUsers)) {
-                                _context2.next = 12;
+                                _context2.next = 11;
                                 break;
                             }
 
                             return _context2.abrupt('return', Promise.resolve(user));
 
-                        case 12:
-                            if (!isUpdate) {
-                                _context2.next = 18;
-                                break;
-                            }
-
-                            _context2.next = 15;
+                        case 11:
+                            _context2.next = 13;
                             return userRepository.getByIds([user.id]);
 
-                        case 15:
+                        case 13:
                             usersFromDb = _context2.sent;
-                            userDb = new _ptzUserDomain.User(usersFromDb[0]);
 
-                            user = userDb.update(user);
+                            if (usersFromDb && usersFromDb.length > 0) {
+                                userDb = new _ptzUserDomain.User(usersFromDb[0]);
 
-                        case 18:
-                            _context2.next = 20;
+                                user = userDb.update(user);
+                            }
+                            _context2.next = 17;
                             return userRepository.save(user);
 
-                        case 20:
+                        case 17:
                             user = _context2.sent;
                             return _context2.abrupt('return', Promise.resolve(user));
 
-                        case 22:
+                        case 19:
                         case 'end':
                             return _context2.stop();
                     }
