@@ -1,6 +1,7 @@
 # ptz-user-app
 
 [![Build Status](https://travis-ci.org/polutz/ptz-user-app.svg)](https://travis-ci.org/polutz/ptz-user-app)
+[![NPM](https://img.shields.io/npm/v/ptz-user-app.svg)](https://www.npmjs.com/package/ptz-user-app)
 [![codecov.io](http://codecov.io/github/polutz/ptz-user-app/coverage.svg)](http://codecov.io/github/polutz/ptz-user-app)
 [![Dependency Status](https://gemnasium.com/polutz/ptz-user-app.svg)](https://gemnasium.com/polutz/ptz-user-app)
 [![bitHound Score](https://www.bithound.io/github/gotwarlost/istanbul/badges/score.svg)](https://www.bithound.io/github/polutz/ptz-user-app)
