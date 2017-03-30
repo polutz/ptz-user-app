@@ -1,33 +1,20 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import UserApp from './userApp';
-import {User} from 'ptz-user-domain';
-
 import {
-    ok,
-    notOk,
-    throws,
-    equal,
     contains,
+    emptyArray,
+    equal,
     notContains,
-    emptyArray
+    notOk,
+    ok,
+    throws
 } from 'ptz-assert';
+import { IUserApp, IUserRepository, User } from 'ptz-user-domain';
 import { stub } from 'sinon';
+import UserApp from './userApp';
 
-var userRepository: IUserRepository,
-    userApp: IUserApp;
-var userRepositorySaveCalls = 0;
-
-function getUserRepository():IUserRepository{
-    return {
-        getOtherUsersWithSameUserNameOrEmail: function(){},
-        find: function(){},
-        getByIds: function(){},
-        getByUserNameOrEmail: function(){},
-        save: function(){}
-    }
-}
+var userApp: IUserApp;
 
 describe('UserApp', () => {
     describe('save', () => {
@@ -41,7 +28,7 @@ describe('UserApp', () => {
             };
 
             stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
-            userApp = UserApp(userRepository);
+            userApp = new UserApp(userRepository);
         });
 
         it('hash password', async () => {
@@ -59,7 +46,7 @@ describe('UserApp', () => {
         });
 
         it('do not call repository if user is invalid', async () => {
-            var user = {
+            const user = {
                 userName: '',
                 email: '',
                 displayName: ''
@@ -69,7 +56,7 @@ describe('UserApp', () => {
         });
 
         it('call repository if User is valid', async () => {
-            var user: IUserArgs = {
+            const user: IUserArgs = {
                 userName: 'angeloocana',
                 email: 'angeloocana@gmail.com',
                 displayName: ''
@@ -81,21 +68,21 @@ describe('UserApp', () => {
 
     describe('authenticateUser', () => {
         beforeEach(() => {
-            userRepository = UserRepository(null);
-            userApp = UserApp(userRepository);
+            userRepository = new UserRepository(null);
+            userApp = new UserApp(userRepository);
         });
 
         it('User not found should return user with error', async () => {
-            var userName = 'angeloocana';
+            const userName = 'angeloocana';
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
-            var user = await userApp.authenticateUser(userName, 'teste');
+            const user = await userApp.authenticateUser(userName, 'teste');
 
             contains(user.errors, 'ERROR_USER_INVALID_USERNAME_OR_PASSWORD');
         });
 
         it('User found but incorrect password should return user with error', async () => {
-            var password = 'testeteste';
+            const password = 'testeteste';
 
             var user = new User({ userName: 'angeloocana', email: '', displayName: '', password });
 
@@ -109,7 +96,7 @@ describe('UserApp', () => {
 
         });
         it('User found and correct password should return the user', async () => {
-            var password = 'testeteste';
+            const password = 'testeteste';
 
             var user = new User({ userName: 'angeloocana', email: 'alanmarcell@live.com', displayName: '', password });
 
@@ -140,18 +127,18 @@ describe('UserApp', () => {
             user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
-            var userToken = await userApp.getAuthToken('lnsilva', '123456');
+            const userToken = await userApp.getAuthToken('lnsilva', '123456');
 
             ok(userToken.accessToken, 'Empty Token');
-
         });
+
         it('When user is invalid password does not generate token', async () => {
 
             const user = User.getUserAthenticationError('');
 
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
-            var userToken = await userApp.getAuthToken('lnsilva', '123456');
+            const userToken = await userApp.getAuthToken('lnsilva', '123456');
 
             notOk(userToken.accessToken, 'Not Empty Token');
         });
@@ -159,14 +146,14 @@ describe('UserApp', () => {
 
     describe('verifyAuthToken', () => {
         beforeEach(() => {
-            userRepository = UserRepository(null);
-            userApp = UserApp(userRepository);
+            userRepository = new UserRepository(null);
+            userApp = new UserApp(userRepository);
         });
 
         it('Invalid token throws exception', async () => {
             var hasError = false;
             try {
-                var userByToken = await userApp.verifyAuthToken('Invalid_Token');
+                await userApp.verifyAuthToken('Invalid_Token');
             } catch (err) {
                 hasError = true;
             }
@@ -184,11 +171,11 @@ describe('UserApp', () => {
             user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
-            var userToken = await userApp.getAuthToken('lnsilva', '123456');
+            const userToken = await userApp.getAuthToken('lnsilva', '123456');
 
             ok(userToken.accessToken, 'Empty Token');
 
-            var userByToken = await userApp.verifyAuthToken(userToken.accessToken);
+            const userByToken = await userApp.verifyAuthToken(userToken.accessToken);
 
             equal(userByToken.id, user.id, 'User Id dont match');
 
