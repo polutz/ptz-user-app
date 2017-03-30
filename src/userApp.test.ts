@@ -10,22 +10,18 @@ import {
     ok,
     throws
 } from 'ptz-assert';
-import { IUserApp, IUserRepository, User } from 'ptz-user-domain';
+import { IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
 import { stub } from 'sinon';
 import UserApp from './userApp';
+import UserRepositoryFake from './UserRepositoryFake';
 
-var userApp: IUserApp;
+var userApp: IUserApp,
+    userRepository: IUserRepository;
 
 describe('UserApp', () => {
     describe('save', () => {
         beforeEach(() => {
-            userRepositorySaveCalls = 0;
-            userRepository = getUserRepository();
-
-            userRepository.save = async function (user) {
-                userRepositorySaveCalls++;
-                return Promise.resolve(user);
-            };
+            userRepository = new UserRepositoryFake(null);
 
             stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
             userApp = new UserApp(userRepository);
@@ -68,7 +64,6 @@ describe('UserApp', () => {
 
     describe('authenticateUser', () => {
         beforeEach(() => {
-            userRepository = new UserRepository(null);
             userApp = new UserApp(userRepository);
         });
 

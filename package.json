@@ -26,6 +26,7 @@
     "dotenv": "^4.0.0",
     "jwt-simple": "^0.5.1",
     "ptz-assert": "^1.2.0",
+    "ptz-core-app": "^1.0.0",
     "ptz-user-domain": "^1.0.1"
   },
   "devDependencies": {

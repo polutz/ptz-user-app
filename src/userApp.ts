@@ -1,6 +1,6 @@
-import { compare, hash  } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
-import { IUser, IUserApp, IUserRepository, User } from 'ptz-user-domain';
+import { IUser, IUserArgs, IUserApp, IUserRepository, User } from 'ptz-user-domain';
 
 export default class UserApp implements IUserApp {
 
@@ -25,8 +25,8 @@ export default class UserApp implements IUserApp {
         return Promise.resolve(user);
     }
 
-    async save(user: IUser): Promise<IUser> {
-        user = new User(user);
+    async save(userArgs: IUserArgs): Promise<IUser> {
+        var user: IUser = new User(userArgs);
 
         user = await this.hashPassword(user);
 
