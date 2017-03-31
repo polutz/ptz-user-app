@@ -91,14 +91,14 @@ var UserApp = function () {
         }
     }, {
         key: 'save',
-        value: function save(user) {
+        value: function save(userArgs) {
             return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
-                var otherUsers, userDb;
+                var user, otherUsers, userDb;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                user = new _ptzUserDomain.User(user);
+                                user = new _ptzUserDomain.User(userArgs);
                                 _context2.next = 3;
                                 return this.hashPassword(user);
 

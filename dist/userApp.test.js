@@ -14,6 +14,10 @@ var _userApp = require('./userApp');
 
 var _userApp2 = _interopRequireDefault(_userApp);
 
+var _UserRepositoryFake = require('./UserRepositoryFake');
+
+var _UserRepositoryFake2 = _interopRequireDefault(_UserRepositoryFake);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
@@ -43,11 +47,12 @@ var __awaiter = undefined && undefined.__awaiter || function (thisArg, _argument
 
 _dotenv2.default.config();
 
-var userApp, userRepository;
 describe('UserApp', function () {
     describe('save', function () {
+        var userApp, userRepository;
         beforeEach(function () {
-            userRepository = {};
+            userRepository = new _UserRepositoryFake2.default(null);
+            (0, _sinon.spy)(userRepository, 'save');
             (0, _sinon.stub)(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
             userApp = new _userApp2.default(userRepository);
         });
@@ -83,7 +88,7 @@ describe('UserApp', function () {
         });
         it('do not call repository if user is invalid', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
-                var user;
+                var user, notCalled;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
@@ -97,9 +102,11 @@ describe('UserApp', function () {
                                 return userApp.save(user);
 
                             case 3:
-                                (0, _ptzAssert.equal)(userRepositorySaveCalls, 0);
+                                notCalled = 'notCalled';
 
-                            case 4:
+                                (0, _ptzAssert.ok)(userRepository.save[notCalled]);
+
+                            case 5:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -109,7 +116,7 @@ describe('UserApp', function () {
         });
         it('call repository if User is valid', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee3() {
-                var user;
+                var user, calledOnce;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
@@ -123,9 +130,11 @@ describe('UserApp', function () {
                                 return userApp.save(user);
 
                             case 3:
-                                (0, _ptzAssert.equal)(userRepositorySaveCalls, 1);
+                                calledOnce = 'calledOnce';
 
-                            case 4:
+                                (0, _ptzAssert.ok)(userRepository.save[calledOnce]);
+
+                            case 5:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -135,7 +144,9 @@ describe('UserApp', function () {
         });
     });
     describe('authenticateUser', function () {
+        var userApp, userRepository;
         beforeEach(function () {
+            userRepository = new _UserRepositoryFake2.default(null);
             userApp = new _userApp2.default(userRepository);
         });
         it('User not found should return user with error', function () {
@@ -172,7 +183,12 @@ describe('UserApp', function () {
                         switch (_context5.prev = _context5.next) {
                             case 0:
                                 password = 'testeteste';
-                                user = new _ptzUserDomain.User({ userName: 'angeloocana', email: '', displayName: '', password: password });
+                                user = new _ptzUserDomain.User({
+                                    userName: 'angeloocana',
+                                    email: '',
+                                    displayName: '',
+                                    password: password
+                                });
                                 _context5.next = 4;
                                 return userApp.hashPassword(user);
 
@@ -204,7 +220,12 @@ describe('UserApp', function () {
                         switch (_context6.prev = _context6.next) {
                             case 0:
                                 password = 'testeteste';
-                                user = new _ptzUserDomain.User({ userName: 'angeloocana', email: 'alanmarcell@live.com', displayName: '', password: password });
+                                user = new _ptzUserDomain.User({
+                                    userName: 'angeloocana',
+                                    email: 'alanmarcell@live.com',
+                                    displayName: '',
+                                    password: password
+                                });
                                 _context6.next = 4;
                                 return userApp.hashPassword(user);
 
@@ -231,9 +252,10 @@ describe('UserApp', function () {
         });
     });
     describe('getAuthToken', function () {
+        var userApp, userRepository;
         beforeEach(function () {
-            userRepository = UserRepository(null);
-            userApp = (0, _userApp2.default)(userRepository);
+            userRepository = new _UserRepositoryFake2.default(null);
+            userApp = new _userApp2.default(userRepository);
         });
         it('When user is valid password generate token', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee7() {
@@ -298,8 +320,9 @@ describe('UserApp', function () {
         });
     });
     describe('verifyAuthToken', function () {
+        var userApp, userRepository;
         beforeEach(function () {
-            userRepository = new UserRepository(null);
+            userRepository = new _UserRepositoryFake2.default(null);
             userApp = new _userApp2.default(userRepository);
         });
         it('Invalid token throws exception', function () {

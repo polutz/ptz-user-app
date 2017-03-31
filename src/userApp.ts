@@ -1,6 +1,6 @@
 import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
-import { IUser, IUserArgs, IUserApp, IUserRepository, User } from 'ptz-user-domain';
+import { IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
 
 export default class UserApp implements IUserApp {
 

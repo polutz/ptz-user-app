@@ -10,20 +10,22 @@ import {
     ok,
     throws
 } from 'ptz-assert';
-import { IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
-import { stub } from 'sinon';
+import { IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
+import { spy, stub } from 'sinon';
 import UserApp from './userApp';
 import UserRepositoryFake from './UserRepositoryFake';
 
-var userApp: IUserApp,
-    userRepository: IUserRepository;
-
 describe('UserApp', () => {
     describe('save', () => {
+        var userApp: IUserApp,
+            userRepository: IUserRepository;
+
         beforeEach(() => {
             userRepository = new UserRepositoryFake(null);
 
+            spy(userRepository, 'save');
             stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
+
             userApp = new UserApp(userRepository);
         });
 
@@ -48,7 +50,8 @@ describe('UserApp', () => {
                 displayName: ''
             };
             await userApp.save(user);
-            equal(userRepositorySaveCalls, 0);
+            const notCalled = 'notCalled';
+            ok(userRepository.save[notCalled]);
         });
 
         it('call repository if User is valid', async () => {
@@ -58,12 +61,17 @@ describe('UserApp', () => {
                 displayName: ''
             };
             await userApp.save(user);
-            equal(userRepositorySaveCalls, 1);
+            const calledOnce = 'calledOnce';
+            ok(userRepository.save[calledOnce]);
         });
     });
 
     describe('authenticateUser', () => {
+        var userApp: IUserApp,
+            userRepository: IUserRepository;
+
         beforeEach(() => {
+            userRepository = new UserRepositoryFake(null);
             userApp = new UserApp(userRepository);
         });
 
@@ -79,7 +87,12 @@ describe('UserApp', () => {
         it('User found but incorrect password should return user with error', async () => {
             const password = 'testeteste';
 
-            var user = new User({ userName: 'angeloocana', email: '', displayName: '', password });
+            var user: IUser = new User({
+                userName: 'angeloocana',
+                email: '',
+                displayName: '',
+                password
+            });
 
             user = await userApp.hashPassword(user);
 
@@ -88,12 +101,17 @@ describe('UserApp', () => {
             user = await userApp.authenticateUser(user.userName, 'incorrectPassword');
 
             contains(user.errors, 'ERROR_USER_INVALID_USERNAME_OR_PASSWORD');
-
         });
+
         it('User found and correct password should return the user', async () => {
             const password = 'testeteste';
 
-            var user = new User({ userName: 'angeloocana', email: 'alanmarcell@live.com', displayName: '', password });
+            var user: IUser = new User({
+                userName: 'angeloocana',
+                email: 'alanmarcell@live.com',
+                displayName: '',
+                password
+            });
 
             user = await userApp.hashPassword(user);
 
@@ -107,13 +125,16 @@ describe('UserApp', () => {
     });
 
     describe('getAuthToken', () => {
+        var userApp: IUserApp,
+            userRepository: IUserRepository;
+
         beforeEach(() => {
-            userRepository = UserRepository(null);
-            userApp = UserApp(userRepository);
+            userRepository = new UserRepositoryFake(null);
+            userApp = new UserApp(userRepository);
         });
 
         it('When user is valid password generate token', async () => {
-            var user = new User({
+            var user: IUser = new User({
                 userName: 'lnsilva'
                 , email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
                 password: '123456'
@@ -140,8 +161,11 @@ describe('UserApp', () => {
     });
 
     describe('verifyAuthToken', () => {
+        var userApp: IUserApp,
+            userRepository: IUserRepository;
+
         beforeEach(() => {
-            userRepository = new UserRepository(null);
+            userRepository = new UserRepositoryFake(null);
             userApp = new UserApp(userRepository);
         });
 
@@ -156,7 +180,7 @@ describe('UserApp', () => {
         });
 
         it('Valid token return user', async () => {
-            var user = new User({
+            var user: IUser = new User({
                 userName: 'lnsilva',
                 email: 'lucas.neris@globalpoints.com.br',
                 displayName: 'Lucas Neris',
