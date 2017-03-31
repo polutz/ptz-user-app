@@ -30,6 +30,7 @@
     "ptz-user-domain": "^1.1.4"
   },
   "devDependencies": {
+    "@types/node": "^7.0.12",
     "babel-core": "^6.24.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-es2015": "^6.24.0",
