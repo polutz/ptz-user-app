@@ -26,6 +26,8 @@ export default class UserApp implements IUserApp {
     }
 
     async save(userArgs: IUserArgs): Promise<IUser> {
+        console.log('save userArgs:', userArgs);
+
         var user: IUser = new User(userArgs);
 
         user = await this.hashPassword(user);
@@ -45,6 +47,7 @@ export default class UserApp implements IUserApp {
 
         user = await this.userRepository.save(user);
 
+        console.log('return user:', user);
         return Promise.resolve(user);
     }
 

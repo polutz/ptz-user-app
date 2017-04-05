@@ -5,12 +5,15 @@
   "main": "dist/index.js",
   "typings": "src/index.js",
   "scripts": {
+    "postinstall": "typings install",
     "lint": "tslint ./src/**/*.ts ./src/**/*.test.ts ./src/**/*.d.ts",
-    "js": "gulp js",
-    "gensalt": "node gensalt.js",
+    "js": "tsc",
     "pretest": "npm-run-all --parallel js lint gensalt",
     "mocha": "mocha ./dist/**/*.js --compilers js:babel-core/register --require babel-polyfill",
-    "test": "nyc npm run mocha && nyc report --reporter=text-lcov > coverage.lcov && codecov --token=b1c7616b-9a84-436e-9329-50273c9d72db"
+    "test": "nyc npm run mocha && nyc report --reporter=text-lcov > coverage.lcov && codecov --token=b1c7616b-9a84-436e-9329-50273c9d72db",
+    "predebug": "npm run pretest",
+    "debug": "babel-node --presets es2015 --nolazy --debug-brk=5858 dist/index.js",
+    "gensalt": "node gensalt.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +25,11 @@
     "url": "https://github.com/polutz/ptz-user-app/issues"
   },
   "homepage": "https://github.com/polutz/ptz-user-app#readme",
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "dotenv": "^4.0.0",
@@ -49,10 +57,5 @@
     "tslint": "^5.0.0",
     "typescript": "^2.2.2",
     "typings": "^2.1.0"
-  },
-  "babel": {
-    "presets": [
-      "es2015"
-    ]
   }
 }
