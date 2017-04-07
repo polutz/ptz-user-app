@@ -20,7 +20,7 @@ describe('UserApp', () => {
             userRepository = new UserRepositoryFake(null);
             spy(userRepository, 'save');
             stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
-            userApp = new UserApp(userRepository);
+            userApp = new UserApp({ userRepository });
         });
         it('hash password', () => __awaiter(this, void 0, void 0, function* () {
             var user = {
@@ -58,7 +58,7 @@ describe('UserApp', () => {
         var userApp, userRepository;
         beforeEach(() => {
             userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp(userRepository);
+            userApp = new UserApp({ userRepository });
         });
         it('User not found should return user with error', () => __awaiter(this, void 0, void 0, function* () {
             const userName = 'angeloocana';
@@ -98,7 +98,7 @@ describe('UserApp', () => {
         var userApp, userRepository;
         beforeEach(() => {
             userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp(userRepository);
+            userApp = new UserApp({ userRepository });
         });
         it('When user is valid password generate token', () => __awaiter(this, void 0, void 0, function* () {
             var user = new User({
@@ -122,7 +122,7 @@ describe('UserApp', () => {
         var userApp, userRepository;
         beforeEach(() => {
             userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp(userRepository);
+            userApp = new UserApp({ userRepository });
         });
         it('Invalid token throws exception', () => __awaiter(this, void 0, void 0, function* () {
             var hasError = false;

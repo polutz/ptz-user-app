@@ -26,7 +26,7 @@ describe('UserApp', () => {
             spy(userRepository, 'save');
             stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
 
-            userApp = new UserApp(userRepository);
+            userApp = new UserApp({userRepository});
         });
 
         it('hash password', async () => {
@@ -72,7 +72,7 @@ describe('UserApp', () => {
 
         beforeEach(() => {
             userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp(userRepository);
+            userApp = new UserApp({userRepository});
         });
 
         it('User not found should return user with error', async () => {
@@ -130,7 +130,7 @@ describe('UserApp', () => {
 
         beforeEach(() => {
             userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp(userRepository);
+            userApp = new UserApp({userRepository});
         });
 
         it('When user is valid password generate token', async () => {
@@ -166,7 +166,7 @@ describe('UserApp', () => {
 
         beforeEach(() => {
             userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp(userRepository);
+            userApp = new UserApp({userRepository});
         });
 
         it('Invalid token throws exception', async () => {

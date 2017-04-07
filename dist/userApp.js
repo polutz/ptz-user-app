@@ -8,12 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
+import { BaseApp } from 'ptz-core-app';
 import { User, users } from 'ptz-user-domain';
-export default class UserApp {
-    constructor(userRepository) {
+export default class UserApp extends BaseApp {
+    constructor(userAppArgs) {
+        super(userAppArgs);
         this.tokenSecret = process.env.PASSWORD_SALT;
         this.passwordSalt = process.env.PASSWORD_SALT;
-        this.userRepository = userRepository;
+        this.userRepository = userAppArgs.userRepository;
     }
     hashPassword(user) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -28,7 +30,7 @@ export default class UserApp {
     }
     save(userArgs) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('save userArgs:', userArgs);
+            this.log('UserApp.save userArgs:', userArgs);
             var user = new User(userArgs);
             user = yield this.hashPassword(user);
             if (!user.isValid())
@@ -40,7 +42,7 @@ export default class UserApp {
             if (userDb)
                 user = userDb.update(user);
             user = yield this.userRepository.save(user);
-            console.log('return user:', user);
+            this.log('UserApp.save return:', user);
             return Promise.resolve(user);
         });
     }
@@ -73,7 +75,10 @@ export default class UserApp {
         return Promise.resolve(user);
     }
     seed() {
-        users.allUsers.forEach(user => this.userRepository.save(user));
+        return __awaiter(this, void 0, void 0, function* () {
+            this.log('seeding users =============>', users.allUsers);
+            users.allUsers.forEach((user) => __awaiter(this, void 0, void 0, function* () { return yield this.save(user); }));
+        });
     }
 }
 //# sourceMappingURL=userApp.js.map

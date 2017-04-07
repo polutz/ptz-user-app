@@ -5,7 +5,6 @@
   "main": "dist/index.js",
   "typings": "src/index.js",
   "scripts": {
-    "postinstall": "typings install",
     "lint": "tslint ./src/**/*.ts ./src/**/*.test.ts ./src/**/*.d.ts",
     "js": "tsc",
     "pretest": "npm-run-all --parallel js lint gensalt",
@@ -25,16 +24,10 @@
     "url": "https://github.com/polutz/ptz-user-app/issues"
   },
   "homepage": "https://github.com/polutz/ptz-user-app#readme",
-  "babel": {
-    "presets": [
-      "es2015"
-    ]
-  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "dotenv": "^4.0.0",
     "jwt-simple": "^0.5.1",
-    "ptz-assert": "^1.2.0",
     "ptz-core-app": "^1.0.0",
     "ptz-user-domain": "^1.1.4"
   },

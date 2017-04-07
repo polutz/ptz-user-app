@@ -1,15 +1,18 @@
 import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
-import { IUser, IUserApp, IUserArgs, IUserRepository, User, users } from 'ptz-user-domain';
+import { BaseApp } from 'ptz-core-app';
+import { IUser, IUserApp, IUserAppArgs, IUserArgs, IUserRepository, User, users } from 'ptz-user-domain';
 
-export default class UserApp implements IUserApp {
+export default class UserApp extends BaseApp implements IUserApp {
 
     tokenSecret = process.env.PASSWORD_SALT;
     passwordSalt = process.env.PASSWORD_SALT;
+
     private userRepository: IUserRepository;
 
-    constructor(userRepository: IUserRepository) {
-        this.userRepository = userRepository;
+    constructor(userAppArgs: IUserAppArgs) {
+        super(userAppArgs);
+        this.userRepository = userAppArgs.userRepository;
     }
 
     async hashPassword(user: IUser): Promise<IUser> {
@@ -26,7 +29,7 @@ export default class UserApp implements IUserApp {
     }
 
     async save(userArgs: IUserArgs): Promise<IUser> {
-        console.log('save userArgs:', userArgs);
+        this.log('UserApp.save userArgs:', userArgs);
 
         var user: IUser = new User(userArgs);
 
@@ -47,7 +50,7 @@ export default class UserApp implements IUserApp {
 
         user = await this.userRepository.save(user);
 
-        console.log('return user:', user);
+        this.log('UserApp.save return:', user);
         return Promise.resolve(user);
     }
 
@@ -85,7 +88,8 @@ export default class UserApp implements IUserApp {
         return Promise.resolve(user);
     }
 
-    seed() {
-        users.allUsers.forEach(user => this.userRepository.save(user));
+    async seed() {
+        this.log('seeding users =============>', users.allUsers);
+        users.allUsers.forEach(async user => await this.save(user));
     }
 }
