@@ -1,6 +1,10 @@
 ## master
 
 
+## 1.2.0 (April 7, 2017)
+
+* Add BaseApp and log.
+
 ## 1.1.1 (April 7, 2017)
 
 * Add seed to UserApp.
