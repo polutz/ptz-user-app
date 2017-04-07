@@ -1,6 +1,6 @@
 import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
-import { IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
+import { IUser, IUserApp, IUserArgs, IUserRepository, User, users } from 'ptz-user-domain';
 
 export default class UserApp implements IUserApp {
 
@@ -83,5 +83,9 @@ export default class UserApp implements IUserApp {
     verifyAuthToken(token: string): Promise<User> {
         const user = decode(token, this.passwordSalt);
         return Promise.resolve(user);
+    }
+
+    seed() {
+        users.allUsers.forEach(user => this.userRepository.save(user));
     }
 }

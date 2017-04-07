@@ -49,7 +49,8 @@ FN:19,_callee
 FN:30,_callee2
 FN:51,_callee3
 FN:64,_callee4
-FNF:11
+FN:76,(anonymous_27)
+FNF:12
 FNH:10
 FNDA:19,(anonymous_4)
 FNDA:19,(anonymous_5)
@@ -62,6 +63,7 @@ FNDA:26,_callee
 FNDA:18,_callee2
 FNDA:28,_callee3
 FNDA:12,_callee4
+FNDA:0,(anonymous_27)
 DA:1,1
 DA:2,19
 DA:3,27
@@ -100,7 +102,9 @@ DA:66,3
 DA:67,2
 DA:72,2
 DA:73,1
-LF:38
+DA:75,0
+DA:76,0
+LF:40
 LH:34
 BRDA:1,0,0,1
 BRDA:1,0,1,0

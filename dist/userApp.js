@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
-import { User } from 'ptz-user-domain';
+import { User, users } from 'ptz-user-domain';
 export default class UserApp {
     constructor(userRepository) {
         this.tokenSecret = process.env.PASSWORD_SALT;
@@ -71,6 +71,9 @@ export default class UserApp {
     verifyAuthToken(token) {
         const user = decode(token, this.passwordSalt);
         return Promise.resolve(user);
+    }
+    seed() {
+        users.allUsers.forEach(user => this.userRepository.save(user));
     }
 }
 //# sourceMappingURL=userApp.js.map
