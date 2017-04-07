@@ -1,5 +1,16 @@
 TN:
-SF:/projects/polutz/ptz-user-app/dist/UserRepositoryFake.js
+SF:/home/angeloocana/dev/polutz/ptz-user-app/ptz-babel-register.js
+FNF:0
+FNH:0
+DA:1,1
+DA:3,1
+LF:2
+LH:2
+BRF:0
+BRH:0
+end_of_record
+TN:
+SF:/home/angeloocana/dev/polutz/ptz-user-app/dist/UserRepositoryFake.js
 FN:3,UserRepositoryFake
 FNF:1
 FNH:1
@@ -16,7 +27,7 @@ BRF:2
 BRH:1
 end_of_record
 TN:
-SF:/projects/polutz/ptz-user-app/dist/index.js
+SF:/home/angeloocana/dev/polutz/ptz-user-app/dist/index.js
 FNF:0
 FNH:0
 DA:1,1
@@ -26,7 +37,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/projects/polutz/ptz-user-app/dist/userApp.js
+SF:/home/angeloocana/dev/polutz/ptz-user-app/dist/userApp.js
 FN:1,(anonymous_4)
 FN:2,(anonymous_5)
 FN:3,fulfilled
