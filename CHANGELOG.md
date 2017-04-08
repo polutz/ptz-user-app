@@ -1,6 +1,10 @@
 ## master
 
 
+## 1.2.1 (April 7, 2017)
+
+* Remove babel-node, babel-polyfill, babel-core and ptz-babel-register.
+
 ## 1.2.0 (April 7, 2017)
 
 * Add BaseApp and log.

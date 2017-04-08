@@ -1,6 +1,6 @@
 {
   "name": "ptz-user-app",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Polutz User App.",
   "main": "dist/index.js",
   "typings": "src/index.js",
