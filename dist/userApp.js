@@ -102,60 +102,61 @@ var UserApp = function (_BaseApp) {
         }
     }, {
         key: 'save',
-        value: function save(userArgs) {
+        value: function save(args) {
             return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
                 var user, otherUsers, userDb;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
-                                this.log('UserApp.save userArgs:', userArgs);
-                                user = new _ptzUserDomain.User(userArgs);
-                                _context2.next = 4;
+                                this.log('UserApp.save args:', args);
+                                args.userArgs.createdBy = args.createdBy;
+                                user = new _ptzUserDomain.User(args.userArgs);
+                                _context2.next = 5;
                                 return this.hashPassword(user);
 
-                            case 4:
+                            case 5:
                                 user = _context2.sent;
 
                                 if (user.isValid()) {
-                                    _context2.next = 7;
+                                    _context2.next = 8;
                                     break;
                                 }
 
                                 return _context2.abrupt('return', Promise.resolve(user));
 
-                            case 7:
-                                _context2.next = 9;
+                            case 8:
+                                _context2.next = 10;
                                 return this.userRepository.getOtherUsersWithSameUserNameOrEmail(user);
 
-                            case 9:
+                            case 10:
                                 otherUsers = _context2.sent;
 
                                 if (!user.otherUsersWithSameUserNameOrEmail(otherUsers)) {
-                                    _context2.next = 12;
+                                    _context2.next = 13;
                                     break;
                                 }
 
                                 return _context2.abrupt('return', Promise.resolve(user));
 
-                            case 12:
-                                _context2.next = 14;
+                            case 13:
+                                _context2.next = 15;
                                 return this.userRepository.getById(user.id);
 
-                            case 14:
+                            case 15:
                                 userDb = _context2.sent;
 
                                 if (userDb) user = userDb.update(user);
-                                _context2.next = 18;
+                                _context2.next = 19;
                                 return this.userRepository.save(user);
 
-                            case 18:
+                            case 19:
                                 user = _context2.sent;
 
                                 this.log('UserApp.save return:', user);
                                 return _context2.abrupt('return', Promise.resolve(user));
 
-                            case 21:
+                            case 22:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -165,14 +166,12 @@ var UserApp = function (_BaseApp) {
         }
     }, {
         key: 'find',
-        value: function find(query, _ref) {
-            var limit = _ref.limit;
-
-            return this.userRepository.find(query, { limit: limit });
+        value: function find(args) {
+            return this.userRepository.find(args.query, { limit: args.options.limit });
         }
     }, {
         key: 'authenticateUser',
-        value: function authenticateUser(userNameOrEmail, password) {
+        value: function authenticateUser(args) {
             return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee3() {
                 var user, userError, res;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
@@ -180,11 +179,11 @@ var UserApp = function (_BaseApp) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
                                 _context3.next = 2;
-                                return this.userRepository.getByUserNameOrEmail(userNameOrEmail);
+                                return this.userRepository.getByUserNameOrEmail(args.userNameOrEmail);
 
                             case 2:
                                 user = _context3.sent;
-                                userError = _ptzUserDomain.User.getUserAthenticationError(userNameOrEmail);
+                                userError = _ptzUserDomain.User.getUserAthenticationError(args.userNameOrEmail);
 
                                 if (user) {
                                     _context3.next = 6;
@@ -195,7 +194,7 @@ var UserApp = function (_BaseApp) {
 
                             case 6:
                                 _context3.next = 8;
-                                return (0, _bcryptjs.compare)(password, user.passwordHash);
+                                return (0, _bcryptjs.compare)(args.password, user.passwordHash);
 
                             case 8:
                                 res = _context3.sent;
@@ -220,7 +219,7 @@ var UserApp = function (_BaseApp) {
         }
     }, {
         key: 'getAuthToken',
-        value: function getAuthToken(userNameOrEmail, password) {
+        value: function getAuthToken(args) {
             return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee4() {
                 var user;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
@@ -228,7 +227,7 @@ var UserApp = function (_BaseApp) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
                                 _context4.next = 2;
-                                return this.authenticateUser(userNameOrEmail, password);
+                                return this.authenticateUser(args);
 
                             case 2:
                                 user = _context4.sent;
@@ -246,8 +245,8 @@ var UserApp = function (_BaseApp) {
         }
     }, {
         key: 'verifyAuthToken',
-        value: function verifyAuthToken(token) {
-            var user = (0, _jwtSimple.decode)(token, this.passwordSalt);
+        value: function verifyAuthToken(args) {
+            var user = (0, _jwtSimple.decode)(args.token, this.passwordSalt);
             return Promise.resolve(user);
         }
     }, {
@@ -256,11 +255,23 @@ var UserApp = function (_BaseApp) {
             return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee6() {
                 var _this2 = this;
 
+                var createdBy;
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
-                                this.log('seeding users =============>', _ptzUserDomain.users.allUsers);
+                                this.log('seeding users', _ptzUserDomain.users.allUsers);
+                                createdBy = {
+                                    ip: '',
+                                    dtCreated: new Date(),
+                                    user: {
+                                        displayName: 'Seed',
+                                        id: 'ptz-user-app UserApp.seed()',
+                                        email: '',
+                                        userName: ''
+                                    }
+                                };
+
                                 _ptzUserDomain.users.allUsers.forEach(function (user) {
                                     return __awaiter(_this2, void 0, void 0, regeneratorRuntime.mark(function _callee5() {
                                         return regeneratorRuntime.wrap(function _callee5$(_context5) {
@@ -268,7 +279,7 @@ var UserApp = function (_BaseApp) {
                                                 switch (_context5.prev = _context5.next) {
                                                     case 0:
                                                         _context5.next = 2;
-                                                        return this.save(user);
+                                                        return this.save({ userArgs: user, createdBy: createdBy });
 
                                                     case 2:
                                                         return _context5.abrupt('return', _context5.sent);
@@ -282,7 +293,7 @@ var UserApp = function (_BaseApp) {
                                     }));
                                 });
 
-                            case 2:
+                            case 3:
                             case 'end':
                                 return _context6.stop();
                         }

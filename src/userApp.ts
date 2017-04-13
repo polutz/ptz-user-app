@@ -1,7 +1,21 @@
 import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
 import { BaseApp } from 'ptz-core-app';
-import { IUser, IUserApp, IUserAppArgs, IUserArgs, IUserRepository, User, users } from 'ptz-user-domain';
+import {
+    ICreatedBy,
+    IUser,
+    IUserApp,
+    IUserAppArgs,
+    IUserAppIAuthenticateUserArgs,
+    IUserAppIFindArgs,
+    IUserAppIGetAuthTokenArgs,
+    IUserAppISaveArgs,
+    IUserAppIVerifyAuthTokenArgs,
+    IUserArgs,
+    IUserRepository,
+    User,
+    users
+} from 'ptz-user-domain';
 
 export default class UserApp extends BaseApp implements IUserApp {
 
@@ -28,10 +42,11 @@ export default class UserApp extends BaseApp implements IUserApp {
         return Promise.resolve(user);
     }
 
-    async save(userArgs: IUserArgs): Promise<IUser> {
-        this.log('UserApp.save userArgs:', userArgs);
+    async save(args: IUserAppISaveArgs): Promise<IUser> {
+        this.log('UserApp.save args:', args);
 
-        var user: IUser = new User(userArgs);
+        args.userArgs.createdBy = args.createdBy;
+        var user: IUser = new User(args.userArgs);
 
         user = await this.hashPassword(user);
 
@@ -54,19 +69,19 @@ export default class UserApp extends BaseApp implements IUserApp {
         return Promise.resolve(user);
     }
 
-    find(query, { limit }) {
-        return this.userRepository.find(query, { limit });
+    find(args: IUserAppIFindArgs): Promise<IUser[]> {
+        return this.userRepository.find(args.query, { limit: args.options.limit });
     }
 
-    async authenticateUser(userNameOrEmail: string, password: string): Promise<IUser> {
-        const user = await this.userRepository.getByUserNameOrEmail(userNameOrEmail);
+    async authenticateUser(args: IUserAppIAuthenticateUserArgs): Promise<IUser> {
+        const user = await this.userRepository.getByUserNameOrEmail(args.userNameOrEmail);
 
-        const userError = User.getUserAthenticationError(userNameOrEmail);
+        const userError = User.getUserAthenticationError(args.userNameOrEmail);
 
         if (!user)
             return Promise.resolve(userError);
 
-        const res = await compare(password, user.passwordHash);
+        const res = await compare(args.password, user.passwordHash);
 
         if (res)
             return Promise.resolve(user);
@@ -74,8 +89,8 @@ export default class UserApp extends BaseApp implements IUserApp {
             return Promise.resolve(userError);
     }
 
-    async getAuthToken(userNameOrEmail: string, password: string): Promise<IUser> {
-        const user = await this.authenticateUser(userNameOrEmail, password);
+    async getAuthToken(args: IUserAppIGetAuthTokenArgs): Promise<IUser> {
+        const user = await this.authenticateUser(args);
 
         if (user.isValid())
             user.accessToken = encode(user, this.tokenSecret);
@@ -83,13 +98,24 @@ export default class UserApp extends BaseApp implements IUserApp {
         return Promise.resolve(user);
     }
 
-    verifyAuthToken(token: string): Promise<User> {
-        const user = decode(token, this.passwordSalt);
+    verifyAuthToken(args: IUserAppIVerifyAuthTokenArgs): Promise<User> {
+        const user = decode(args.token, this.passwordSalt);
         return Promise.resolve(user);
     }
 
-    async seed() {
-        this.log('seeding users =============>', users.allUsers);
-        users.allUsers.forEach(async user => await this.save(user));
+    async seed(): Promise<void> {
+        this.log('seeding users', users.allUsers);
+        const createdBy: ICreatedBy = {
+            ip: '',
+            dtCreated: new Date(),
+            user: {
+                displayName: 'Seed',
+                id: 'ptz-user-app UserApp.seed()',
+                email: '',
+                userName: ''
+            }
+        };
+
+        users.allUsers.forEach(async user => await this.save({ userArgs: user, createdBy }));
     }
 }

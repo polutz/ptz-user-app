@@ -10,10 +10,15 @@ import {
     ok,
     throws
 } from 'ptz-assert';
-import { IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
+import { ICreatedBy, IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
 import { spy, stub } from 'sinon';
 import UserApp from './userApp';
 import UserRepositoryFake from './UserRepositoryFake';
+
+const createdBy: ICreatedBy = {
+    dtCreated: new Date(),
+    ip: ''
+};
 
 describe('UserApp', () => {
     describe('save', () => {
@@ -26,43 +31,53 @@ describe('UserApp', () => {
             spy(userRepository, 'save');
             stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
 
-            userApp = new UserApp({userRepository});
+            userApp = new UserApp({ userRepository });
         });
 
         it('hash password', async () => {
-            var user: IUserArgs = {
+            const userArgs: IUserArgs = {
                 userName: 'angeloocana',
                 email: 'angeloocana@gmail.com',
                 displayName: 'Ângelo Ocanã',
                 password: 'testPassword'
             };
 
-            user = await userApp.save(user);
+            const user = await userApp.save({ userArgs, createdBy });
 
             ok(user.passwordHash, 'passwordHash not set');
             notOk(user.password, 'password not empty');
         });
 
         it('do not call repository if user is invalid', async () => {
-            const user = {
+            const userArgs = {
                 userName: '',
                 email: '',
                 displayName: ''
             };
-            await userApp.save(user);
+            await userApp.save({ userArgs, createdBy });
             const notCalled = 'notCalled';
             ok(userRepository.save[notCalled]);
         });
 
         it('call repository if User is valid', async () => {
-            const user: IUserArgs = {
+            const userArgs: IUserArgs = {
                 userName: 'angeloocana',
                 email: 'angeloocana@gmail.com',
                 displayName: ''
             };
-            await userApp.save(user);
+            await userApp.save({ userArgs, createdBy });
             const calledOnce = 'calledOnce';
             ok(userRepository.save[calledOnce]);
+        });
+
+        it('set createdBy', async () => {
+            const userArgs: IUserArgs = {
+                userName: 'angeloocana',
+                email: 'angeloocana@gmail.com',
+                displayName: ''
+            };
+            const user = await userApp.save({ userArgs, createdBy });
+            equal(user.createdBy, createdBy);
         });
     });
 
@@ -72,14 +87,16 @@ describe('UserApp', () => {
 
         beforeEach(() => {
             userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp({userRepository});
+            userApp = new UserApp({ userRepository });
         });
 
         it('User not found should return user with error', async () => {
-            const userName = 'angeloocana';
+            const userNameOrEmail = 'angeloocana',
+                password = 'teste';
+
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
-            const user = await userApp.authenticateUser(userName, 'teste');
+            const user = await userApp.authenticateUser({ userNameOrEmail, password, createdBy });
 
             contains(user.errors, 'ERROR_USER_INVALID_USERNAME_OR_PASSWORD');
         });
@@ -98,7 +115,11 @@ describe('UserApp', () => {
 
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
-            user = await userApp.authenticateUser(user.userName, 'incorrectPassword');
+            user = await userApp.authenticateUser({
+                userNameOrEmail: user.userName,
+                password: 'incorrectPassword',
+                createdBy
+            });
 
             contains(user.errors, 'ERROR_USER_INVALID_USERNAME_OR_PASSWORD');
         });
@@ -117,7 +138,11 @@ describe('UserApp', () => {
 
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
-            user = await userApp.authenticateUser(user.userName, password);
+            user = await userApp.authenticateUser({
+                userNameOrEmail: user.userName,
+                password,
+                createdBy
+            });
 
             ok(user);
             emptyArray(user.errors);
@@ -130,7 +155,7 @@ describe('UserApp', () => {
 
         beforeEach(() => {
             userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp({userRepository});
+            userApp = new UserApp({ userRepository });
         });
 
         it('When user is valid password generate token', async () => {
@@ -143,7 +168,11 @@ describe('UserApp', () => {
             user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
-            const userToken = await userApp.getAuthToken('lnsilva', '123456');
+            const userToken = await userApp.getAuthToken({
+                userNameOrEmail: 'lnsilva',
+                password: '123456',
+                createdBy
+            });
 
             ok(userToken.accessToken, 'Empty Token');
         });
@@ -154,7 +183,11 @@ describe('UserApp', () => {
 
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
-            const userToken = await userApp.getAuthToken('lnsilva', '123456');
+            const userToken = await userApp.getAuthToken({
+                userNameOrEmail: 'lnsilva',
+                password: '123456',
+                createdBy
+            });
 
             notOk(userToken.accessToken, 'Not Empty Token');
         });
@@ -166,13 +199,16 @@ describe('UserApp', () => {
 
         beforeEach(() => {
             userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp({userRepository});
+            userApp = new UserApp({ userRepository });
         });
 
         it('Invalid token throws exception', async () => {
             var hasError = false;
             try {
-                await userApp.verifyAuthToken('Invalid_Token');
+                await userApp.verifyAuthToken({
+                    token: 'Invalid_Token',
+                    createdBy
+                });
             } catch (err) {
                 hasError = true;
             }
@@ -190,11 +226,18 @@ describe('UserApp', () => {
             user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
-            const userToken = await userApp.getAuthToken('lnsilva', '123456');
+            const userToken = await userApp.getAuthToken({
+                userNameOrEmail: 'lnsilva',
+                password: '123456',
+                createdBy
+            });
 
             ok(userToken.accessToken, 'Empty Token');
 
-            const userByToken = await userApp.verifyAuthToken(userToken.accessToken);
+            const userByToken = await userApp.verifyAuthToken({
+                token: userToken.accessToken,
+                createdBy
+            });
 
             equal(userByToken.id, user.id, 'User Id dont match');
 
