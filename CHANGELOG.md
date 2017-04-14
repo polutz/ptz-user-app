@@ -1,6 +1,10 @@
 ## master
 
 
+## 1.3.0 (April 13, 2017)
+
+* Add CreatedBy to all App functions.
+
 ## 1.2.1 (April 7, 2017)
 
 * Remove babel-node, babel-polyfill, babel-core and ptz-babel-register.
