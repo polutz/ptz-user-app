@@ -1,6 +1,10 @@
 ## master
 
 
+## 1.4.0 (April 19, 2017)
+
+* Add AuthenticateUserForm.
+
 ## 1.3.0 (April 13, 2017)
 
 * Add CreatedBy to all App functions.
