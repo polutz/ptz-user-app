@@ -1,6 +1,11 @@
 ## master
 
 
+## 1.5.1 (April 19, 2017)
+
+* Add errors to getAuthToken return object.
+* Change authenticateUser: return null when invalid authentication instead of returning userAthenticationError.
+
 ## 1.5.0 (April 19, 2017)
 
 * Change UserApp.getAuthToken return from IUser to IAuthToken.
