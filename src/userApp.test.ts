@@ -96,7 +96,10 @@ describe('UserApp', () => {
 
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
-            const user = await userApp.authenticateUser({ userNameOrEmail, password, createdBy });
+            const user = await userApp.authenticateUser({
+                form: { userNameOrEmail, password },
+                createdBy
+            });
 
             contains(user.errors, 'ERROR_USER_INVALID_USERNAME_OR_PASSWORD');
         });
@@ -116,8 +119,10 @@ describe('UserApp', () => {
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
             user = await userApp.authenticateUser({
-                userNameOrEmail: user.userName,
-                password: 'incorrectPassword',
+                form: {
+                    userNameOrEmail: user.userName,
+                    password: 'incorrectPassword'
+                },
                 createdBy
             });
 
@@ -139,8 +144,10 @@ describe('UserApp', () => {
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
             user = await userApp.authenticateUser({
-                userNameOrEmail: user.userName,
-                password,
+                form: {
+                    userNameOrEmail: user.userName,
+                    password
+                },
                 createdBy
             });
 
@@ -169,8 +176,10 @@ describe('UserApp', () => {
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
             const userToken = await userApp.getAuthToken({
-                userNameOrEmail: 'lnsilva',
-                password: '123456',
+                form: {
+                    userNameOrEmail: 'lnsilva',
+                    password: '123456'
+                },
                 createdBy
             });
 
@@ -184,8 +193,10 @@ describe('UserApp', () => {
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
             const userToken = await userApp.getAuthToken({
-                userNameOrEmail: 'lnsilva',
-                password: '123456',
+                form: {
+                    userNameOrEmail: 'lnsilva',
+                    password: '123456'
+                },
                 createdBy
             });
 
@@ -227,8 +238,10 @@ describe('UserApp', () => {
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
             const userToken = await userApp.getAuthToken({
-                userNameOrEmail: 'lnsilva',
-                password: '123456',
+                form: {
+                    userNameOrEmail: 'lnsilva',
+                    password: '123456'
+                },
                 createdBy
             });
 

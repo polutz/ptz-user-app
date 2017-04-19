@@ -192,7 +192,10 @@ describe('UserApp', function () {
 
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(null);
                                 _context5.next = 4;
-                                return userApp.authenticateUser({ userNameOrEmail: userNameOrEmail, password: password, createdBy: createdBy });
+                                return userApp.authenticateUser({
+                                    form: { userNameOrEmail: userNameOrEmail, password: password },
+                                    createdBy: createdBy
+                                });
 
                             case 4:
                                 user = _context5.sent;
@@ -230,8 +233,10 @@ describe('UserApp', function () {
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
                                 _context6.next = 8;
                                 return userApp.authenticateUser({
-                                    userNameOrEmail: user.userName,
-                                    password: 'incorrectPassword',
+                                    form: {
+                                        userNameOrEmail: user.userName,
+                                        password: 'incorrectPassword'
+                                    },
                                     createdBy: createdBy
                                 });
 
@@ -271,8 +276,10 @@ describe('UserApp', function () {
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
                                 _context7.next = 8;
                                 return userApp.authenticateUser({
-                                    userNameOrEmail: user.userName,
-                                    password: password,
+                                    form: {
+                                        userNameOrEmail: user.userName,
+                                        password: password
+                                    },
                                     createdBy: createdBy
                                 });
 
@@ -318,8 +325,10 @@ describe('UserApp', function () {
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
                                 _context8.next = 7;
                                 return userApp.getAuthToken({
-                                    userNameOrEmail: 'lnsilva',
-                                    password: '123456',
+                                    form: {
+                                        userNameOrEmail: 'lnsilva',
+                                        password: '123456'
+                                    },
                                     createdBy: createdBy
                                 });
 
@@ -348,8 +357,10 @@ describe('UserApp', function () {
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(null);
                                 _context9.next = 4;
                                 return userApp.getAuthToken({
-                                    userNameOrEmail: 'lnsilva',
-                                    password: '123456',
+                                    form: {
+                                        userNameOrEmail: 'lnsilva',
+                                        password: '123456'
+                                    },
                                     createdBy: createdBy
                                 });
 
@@ -431,8 +442,10 @@ describe('UserApp', function () {
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
                                 _context11.next = 7;
                                 return userApp.getAuthToken({
-                                    userNameOrEmail: 'lnsilva',
-                                    password: '123456',
+                                    form: {
+                                        userNameOrEmail: 'lnsilva',
+                                        password: '123456'
+                                    },
                                     createdBy: createdBy
                                 });
 

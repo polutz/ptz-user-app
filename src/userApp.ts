@@ -2,6 +2,7 @@ import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
 import { BaseApp } from 'ptz-core-app';
 import {
+    AuthenticateUserForm,
     ICreatedBy,
     IUser,
     IUserApp,
@@ -74,14 +75,16 @@ export default class UserApp extends BaseApp implements IUserApp {
     }
 
     async authenticateUser(args: IUserAppIAuthenticateUserArgs): Promise<IUser> {
-        const user = await this.userRepository.getByUserNameOrEmail(args.userNameOrEmail);
+        const form = new AuthenticateUserForm(args.form);
 
-        const userError = User.getUserAthenticationError(args.userNameOrEmail);
+        const user = await this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
+
+        const userError = User.getUserAthenticationError(form.userNameOrEmail);
 
         if (!user)
             return Promise.resolve(userError);
 
-        const res = await compare(args.password, user.passwordHash);
+        const res = await compare(form.password, user.passwordHash);
 
         if (res)
             return Promise.resolve(user);

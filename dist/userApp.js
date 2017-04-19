@@ -173,43 +173,44 @@ var UserApp = function (_BaseApp) {
         key: 'authenticateUser',
         value: function authenticateUser(args) {
             return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee3() {
-                var user, userError, res;
+                var form, user, userError, res;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                _context3.next = 2;
-                                return this.userRepository.getByUserNameOrEmail(args.userNameOrEmail);
+                                form = new _ptzUserDomain.AuthenticateUserForm(args.form);
+                                _context3.next = 3;
+                                return this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
 
-                            case 2:
+                            case 3:
                                 user = _context3.sent;
-                                userError = _ptzUserDomain.User.getUserAthenticationError(args.userNameOrEmail);
+                                userError = _ptzUserDomain.User.getUserAthenticationError(form.userNameOrEmail);
 
                                 if (user) {
-                                    _context3.next = 6;
+                                    _context3.next = 7;
                                     break;
                                 }
 
                                 return _context3.abrupt('return', Promise.resolve(userError));
 
-                            case 6:
-                                _context3.next = 8;
-                                return (0, _bcryptjs.compare)(args.password, user.passwordHash);
+                            case 7:
+                                _context3.next = 9;
+                                return (0, _bcryptjs.compare)(form.password, user.passwordHash);
 
-                            case 8:
+                            case 9:
                                 res = _context3.sent;
 
                                 if (!res) {
-                                    _context3.next = 13;
+                                    _context3.next = 14;
                                     break;
                                 }
 
                                 return _context3.abrupt('return', Promise.resolve(user));
 
-                            case 13:
+                            case 14:
                                 return _context3.abrupt('return', Promise.resolve(userError));
 
-                            case 14:
+                            case 15:
                             case 'end':
                                 return _context3.stop();
                         }
