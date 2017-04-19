@@ -3,6 +3,7 @@ import { decode, encode } from 'jwt-simple';
 import { BaseApp } from 'ptz-core-app';
 import {
     AuthenticateUserForm,
+    errors as allErrors,
     IAuthToken,
     ICreatedBy,
     IUser,
@@ -80,30 +81,28 @@ export default class UserApp extends BaseApp implements IUserApp {
 
         const user = await this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
 
-        const userError = User.getUserAthenticationError(form.userNameOrEmail);
-
         if (!user)
-            return Promise.resolve(userError);
+            return Promise.resolve(null);
 
-        const res = await compare(form.password, user.passwordHash);
-
-        if (res)
-            return Promise.resolve(user);
-        else
-            return Promise.resolve(userError);
+        const isPasswordCorrect = await compare(form.password, user.passwordHash);
+        return Promise.resolve(isPasswordCorrect ? user : null);
     }
 
     async getAuthToken(args: IUserAppIGetAuthTokenArgs): Promise<IAuthToken> {
         const user = await this.authenticateUser(args);
 
         var authToken = null;
+        const errors = [];
 
-        if (user.isValid())
+        if (user == null)
+            errors.push(allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);
+        else
             authToken = encode(user, this.tokenSecret);
 
         return Promise.resolve({
             authToken,
-            user
+            user,
+            errors
         });
     }
 

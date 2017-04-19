@@ -173,7 +173,7 @@ var UserApp = function (_BaseApp) {
         key: 'authenticateUser',
         value: function authenticateUser(args) {
             return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee3() {
-                var form, user, userError, res;
+                var form, user, isPasswordCorrect;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
@@ -184,33 +184,23 @@ var UserApp = function (_BaseApp) {
 
                             case 3:
                                 user = _context3.sent;
-                                userError = _ptzUserDomain.User.getUserAthenticationError(form.userNameOrEmail);
 
                                 if (user) {
-                                    _context3.next = 7;
+                                    _context3.next = 6;
                                     break;
                                 }
 
-                                return _context3.abrupt('return', Promise.resolve(userError));
+                                return _context3.abrupt('return', Promise.resolve(null));
 
-                            case 7:
-                                _context3.next = 9;
+                            case 6:
+                                _context3.next = 8;
                                 return (0, _bcryptjs.compare)(form.password, user.passwordHash);
 
-                            case 9:
-                                res = _context3.sent;
+                            case 8:
+                                isPasswordCorrect = _context3.sent;
+                                return _context3.abrupt('return', Promise.resolve(isPasswordCorrect ? user : null));
 
-                                if (!res) {
-                                    _context3.next = 14;
-                                    break;
-                                }
-
-                                return _context3.abrupt('return', Promise.resolve(user));
-
-                            case 14:
-                                return _context3.abrupt('return', Promise.resolve(userError));
-
-                            case 15:
+                            case 10:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -222,7 +212,7 @@ var UserApp = function (_BaseApp) {
         key: 'getAuthToken',
         value: function getAuthToken(args) {
             return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee4() {
-                var user, authToken;
+                var user, authToken, errors;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
@@ -233,14 +223,16 @@ var UserApp = function (_BaseApp) {
                             case 2:
                                 user = _context4.sent;
                                 authToken = null;
+                                errors = [];
 
-                                if (user.isValid()) authToken = (0, _jwtSimple.encode)(user, this.tokenSecret);
+                                if (user == null) errors.push(_ptzUserDomain.errors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);else authToken = (0, _jwtSimple.encode)(user, this.tokenSecret);
                                 return _context4.abrupt('return', Promise.resolve({
                                     authToken: authToken,
-                                    user: user
+                                    user: user,
+                                    errors: errors
                                 }));
 
-                            case 6:
+                            case 7:
                             case 'end':
                                 return _context4.stop();
                         }

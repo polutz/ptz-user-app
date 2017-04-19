@@ -181,7 +181,7 @@ describe('UserApp', function () {
             userRepository = new _UserRepositoryFake2.default(null);
             userApp = new _userApp2.default({ userRepository: userRepository });
         });
-        it('User not found should return user with error', function () {
+        it('User not found should return null', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee5() {
                 var userNameOrEmail, password, user;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
@@ -200,7 +200,7 @@ describe('UserApp', function () {
                             case 4:
                                 user = _context5.sent;
 
-                                (0, _ptzAssert.contains)(user.errors, 'ERROR_USER_INVALID_USERNAME_OR_PASSWORD');
+                                (0, _ptzAssert.notOk)(user);
 
                             case 6:
                             case 'end':
@@ -210,7 +210,7 @@ describe('UserApp', function () {
                 }, _callee5, this);
             }));
         });
-        it('User found but incorrect password should return user with error', function () {
+        it('User found but incorrect password should return null', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee6() {
                 var password, user;
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
@@ -243,7 +243,7 @@ describe('UserApp', function () {
                             case 8:
                                 user = _context6.sent;
 
-                                (0, _ptzAssert.contains)(user.errors, 'ERROR_USER_INVALID_USERNAME_OR_PASSWORD');
+                                (0, _ptzAssert.notOk)(user);
 
                             case 10:
                             case 'end':
@@ -345,17 +345,15 @@ describe('UserApp', function () {
                 }, _callee8, this);
             }));
         });
-        it('When user is invalid password does not generate token', function () {
+        describe('invalid password', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee9() {
-                var user, authToken;
+                var authToken;
                 return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
                         switch (_context9.prev = _context9.next) {
                             case 0:
-                                user = _ptzUserDomain.User.getUserAthenticationError('');
-
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(null);
-                                _context9.next = 4;
+                                _context9.next = 3;
                                 return userApp.getAuthToken({
                                     form: {
                                         userNameOrEmail: 'lnsilva',
@@ -364,12 +362,20 @@ describe('UserApp', function () {
                                     createdBy: createdBy
                                 });
 
-                            case 4:
+                            case 3:
                                 authToken = _context9.sent;
 
-                                (0, _ptzAssert.notOk)(authToken.authToken, 'Not Empty Token');
+                                it('do not generate token', function () {
+                                    (0, _ptzAssert.notOk)(authToken.authToken);
+                                });
+                                it('do not return user', function () {
+                                    (0, _ptzAssert.notOk)(authToken.user);
+                                });
+                                it('return invalid userName, email or password error', function () {
+                                    (0, _ptzAssert.contains)(authToken.errors, _ptzUserDomain.errors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);
+                                });
 
-                            case 6:
+                            case 7:
                             case 'end':
                                 return _context9.stop();
                         }

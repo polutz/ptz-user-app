@@ -10,7 +10,7 @@ import {
     ok,
     throws
 } from 'ptz-assert';
-import { ICreatedBy, IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
+import { errors as allErrors, ICreatedBy, IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
 import { spy, stub } from 'sinon';
 import UserApp from './userApp';
 import UserRepositoryFake from './UserRepositoryFake';
@@ -90,7 +90,7 @@ describe('UserApp', () => {
             userApp = new UserApp({ userRepository });
         });
 
-        it('User not found should return user with error', async () => {
+        it('User not found should return null', async () => {
             const userNameOrEmail = 'angeloocana',
                 password = 'teste';
 
@@ -101,10 +101,10 @@ describe('UserApp', () => {
                 createdBy
             });
 
-            contains(user.errors, 'ERROR_USER_INVALID_USERNAME_OR_PASSWORD');
+            notOk(user);
         });
 
-        it('User found but incorrect password should return user with error', async () => {
+        it('User found but incorrect password should return null', async () => {
             const password = 'testeteste';
 
             var user: IUser = new User({
@@ -126,7 +126,7 @@ describe('UserApp', () => {
                 createdBy
             });
 
-            contains(user.errors, 'ERROR_USER_INVALID_USERNAME_OR_PASSWORD');
+            notOk(user);
         });
 
         it('User found and correct password should return the user', async () => {
@@ -186,10 +186,7 @@ describe('UserApp', () => {
             ok(authToken.authToken, 'Empty Token');
         });
 
-        it('When user is invalid password does not generate token', async () => {
-
-            const user = User.getUserAthenticationError('');
-
+        describe('invalid password', async () => {
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
             const authToken = await userApp.getAuthToken({
@@ -200,7 +197,17 @@ describe('UserApp', () => {
                 createdBy
             });
 
-            notOk(authToken.authToken, 'Not Empty Token');
+            it('do not generate token', () => {
+                notOk(authToken.authToken);
+            });
+
+            it('do not return user', () => {
+                notOk(authToken.user);
+            });
+
+            it('return invalid userName, email or password error', () => {
+                contains(authToken.errors, allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);
+            });
         });
     });
 
