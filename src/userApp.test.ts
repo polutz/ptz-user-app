@@ -175,7 +175,7 @@ describe('UserApp', () => {
             user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
-            const userToken = await userApp.getAuthToken({
+            const authToken = await userApp.getAuthToken({
                 form: {
                     userNameOrEmail: 'lnsilva',
                     password: '123456'
@@ -183,7 +183,7 @@ describe('UserApp', () => {
                 createdBy
             });
 
-            ok(userToken.accessToken, 'Empty Token');
+            ok(authToken.authToken, 'Empty Token');
         });
 
         it('When user is invalid password does not generate token', async () => {
@@ -192,7 +192,7 @@ describe('UserApp', () => {
 
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
-            const userToken = await userApp.getAuthToken({
+            const authToken = await userApp.getAuthToken({
                 form: {
                     userNameOrEmail: 'lnsilva',
                     password: '123456'
@@ -200,7 +200,7 @@ describe('UserApp', () => {
                 createdBy
             });
 
-            notOk(userToken.accessToken, 'Not Empty Token');
+            notOk(authToken.authToken, 'Not Empty Token');
         });
     });
 
@@ -237,7 +237,7 @@ describe('UserApp', () => {
             user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
-            const userToken = await userApp.getAuthToken({
+            const authToken = await userApp.getAuthToken({
                 form: {
                     userNameOrEmail: 'lnsilva',
                     password: '123456'
@@ -245,10 +245,10 @@ describe('UserApp', () => {
                 createdBy
             });
 
-            ok(userToken.accessToken, 'Empty Token');
+            ok(authToken.authToken, 'Empty Token');
 
             const userByToken = await userApp.verifyAuthToken({
-                token: userToken.accessToken,
+                token: authToken.authToken,
                 createdBy
             });
 

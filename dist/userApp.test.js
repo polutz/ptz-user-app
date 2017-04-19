@@ -306,7 +306,7 @@ describe('UserApp', function () {
         });
         it('When user is valid password generate token', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee8() {
-                var user, userToken;
+                var user, authToken;
                 return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
                         switch (_context8.prev = _context8.next) {
@@ -333,9 +333,9 @@ describe('UserApp', function () {
                                 });
 
                             case 7:
-                                userToken = _context8.sent;
+                                authToken = _context8.sent;
 
-                                (0, _ptzAssert.ok)(userToken.accessToken, 'Empty Token');
+                                (0, _ptzAssert.ok)(authToken.authToken, 'Empty Token');
 
                             case 9:
                             case 'end':
@@ -347,7 +347,7 @@ describe('UserApp', function () {
         });
         it('When user is invalid password does not generate token', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee9() {
-                var user, userToken;
+                var user, authToken;
                 return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
                         switch (_context9.prev = _context9.next) {
@@ -365,9 +365,9 @@ describe('UserApp', function () {
                                 });
 
                             case 4:
-                                userToken = _context9.sent;
+                                authToken = _context9.sent;
 
-                                (0, _ptzAssert.notOk)(userToken.accessToken, 'Not Empty Token');
+                                (0, _ptzAssert.notOk)(authToken.authToken, 'Not Empty Token');
 
                             case 6:
                             case 'end':
@@ -422,7 +422,7 @@ describe('UserApp', function () {
         });
         it('Valid token return user', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee11() {
-                var user, userToken, userByToken;
+                var user, authToken, userByToken;
                 return regeneratorRuntime.wrap(function _callee11$(_context11) {
                     while (1) {
                         switch (_context11.prev = _context11.next) {
@@ -450,12 +450,12 @@ describe('UserApp', function () {
                                 });
 
                             case 7:
-                                userToken = _context11.sent;
+                                authToken = _context11.sent;
 
-                                (0, _ptzAssert.ok)(userToken.accessToken, 'Empty Token');
+                                (0, _ptzAssert.ok)(authToken.authToken, 'Empty Token');
                                 _context11.next = 11;
                                 return userApp.verifyAuthToken({
-                                    token: userToken.accessToken,
+                                    token: authToken.authToken,
                                     createdBy: createdBy
                                 });
 

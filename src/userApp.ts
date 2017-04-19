@@ -3,6 +3,7 @@ import { decode, encode } from 'jwt-simple';
 import { BaseApp } from 'ptz-core-app';
 import {
     AuthenticateUserForm,
+    IAuthToken,
     ICreatedBy,
     IUser,
     IUserApp,
@@ -92,13 +93,18 @@ export default class UserApp extends BaseApp implements IUserApp {
             return Promise.resolve(userError);
     }
 
-    async getAuthToken(args: IUserAppIGetAuthTokenArgs): Promise<IUser> {
+    async getAuthToken(args: IUserAppIGetAuthTokenArgs): Promise<IAuthToken> {
         const user = await this.authenticateUser(args);
 
-        if (user.isValid())
-            user.accessToken = encode(user, this.tokenSecret);
+        var authToken = null;
 
-        return Promise.resolve(user);
+        if (user.isValid())
+            authToken = encode(user, this.tokenSecret);
+
+        return Promise.resolve({
+            authToken,
+            user
+        });
     }
 
     verifyAuthToken(args: IUserAppIVerifyAuthTokenArgs): Promise<User> {

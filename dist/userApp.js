@@ -222,7 +222,7 @@ var UserApp = function (_BaseApp) {
         key: 'getAuthToken',
         value: function getAuthToken(args) {
             return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee4() {
-                var user;
+                var user, authToken;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
@@ -232,11 +232,15 @@ var UserApp = function (_BaseApp) {
 
                             case 2:
                                 user = _context4.sent;
+                                authToken = null;
 
-                                if (user.isValid()) user.accessToken = (0, _jwtSimple.encode)(user, this.tokenSecret);
-                                return _context4.abrupt('return', Promise.resolve(user));
+                                if (user.isValid()) authToken = (0, _jwtSimple.encode)(user, this.tokenSecret);
+                                return _context4.abrupt('return', Promise.resolve({
+                                    authToken: authToken,
+                                    user: user
+                                }));
 
-                            case 5:
+                            case 6:
                             case 'end':
                                 return _context4.stop();
                         }
