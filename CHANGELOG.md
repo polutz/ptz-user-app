@@ -1,6 +1,10 @@
 ## master
 
 
+## 1.5.0 (April 19, 2017)
+
+* Change UserApp.getAuthToken return from IUser to IAuthToken.
+
 ## 1.4.0 (April 19, 2017)
 
 * Add AuthenticateUserForm.
