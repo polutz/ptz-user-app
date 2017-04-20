@@ -2065,8 +2065,8 @@ ptz-log@^1.0.0:
     moment "^2.18.1"
 
 ptz-user-domain@^1.1.4:
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/ptz-user-domain/-/ptz-user-domain-1.5.2.tgz#0fe862fcb786db544ab102a49267df1a64bb1494"
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/ptz-user-domain/-/ptz-user-domain-1.5.3.tgz#3fbd232059ee97b746fca3fdf622e81c45b437c9"
   dependencies:
     ptz-core-domain "^1.1.4"
 
