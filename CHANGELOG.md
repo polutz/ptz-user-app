@@ -1,6 +1,11 @@
 ## master
 
 
+## 1.5.2 (April 19, 2017)
+
+* Do not call database in order to find a user when authenticateUserForm is
+invalid.
+
 ## 1.5.1 (April 19, 2017)
 
 * Add errors to getAuthToken return object.
