@@ -77,8 +77,7 @@ export default class UserApp extends BaseApp implements IUserApp {
     }
 
     async authenticateUser(args: IUserAppIAuthenticateUserArgs): Promise<IUser> {
-        const form = new AuthenticateUserForm(args.form);
-
+        const { form } = args;
         const user = await this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
 
         if (!user)
@@ -89,9 +88,18 @@ export default class UserApp extends BaseApp implements IUserApp {
     }
 
     async getAuthToken(args: IUserAppIGetAuthTokenArgs): Promise<IAuthToken> {
+        const form = new AuthenticateUserForm(args.form);
+        var authToken = null;
+
+        if (!form.isValid())
+            return Promise.resolve({
+                authToken,
+                user: null,
+                errors: form.errors
+            });
+
         const user = await this.authenticateUser(args);
 
-        var authToken = null;
         const errors = [];
 
         if (user == null)

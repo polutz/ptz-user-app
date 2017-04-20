@@ -51,6 +51,7 @@ var createdBy = {
     dtCreated: new Date(),
     ip: ''
 };
+var notCalled = 'notCalled';
 describe('UserApp', function () {
     describe('save', function () {
         var userApp, userRepository;
@@ -92,7 +93,7 @@ describe('UserApp', function () {
         });
         it('do not call repository if user is invalid', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
-                var userArgs, notCalled;
+                var userArgs;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
@@ -106,11 +107,9 @@ describe('UserApp', function () {
                                 return userApp.save({ userArgs: userArgs, createdBy: createdBy });
 
                             case 3:
-                                notCalled = 'notCalled';
-
                                 (0, _ptzAssert.ok)(userRepository.save[notCalled]);
 
-                            case 5:
+                            case 4:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -299,45 +298,35 @@ describe('UserApp', function () {
         });
     });
     describe('getAuthToken', function () {
-        var userApp, userRepository;
-        beforeEach(function () {
-            userRepository = new _UserRepositoryFake2.default(null);
-            userApp = new _userApp2.default({ userRepository: userRepository });
-        });
-        it('When user is valid password generate token', function () {
+        it('add errors when invalid userName or Email', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee8() {
-                var user, authToken;
+                var userRepository, userApp, authToken;
                 return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
                         switch (_context8.prev = _context8.next) {
                             case 0:
-                                user = new _ptzUserDomain.User({
-                                    userName: 'lnsilva',
-                                    email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
-                                    password: '123456'
-                                });
-                                _context8.next = 3;
-                                return userApp.hashPassword(user);
+                                userRepository = new _UserRepositoryFake2.default(null);
+                                userApp = new _userApp2.default({ userRepository: userRepository });
 
-                            case 3:
-                                user = _context8.sent;
-
-                                (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
-                                _context8.next = 7;
+                                (0, _sinon.spy)(userRepository, 'getByUserNameOrEmail');
+                                _context8.next = 5;
                                 return userApp.getAuthToken({
                                     form: {
-                                        userNameOrEmail: 'lnsilva',
-                                        password: '123456'
+                                        userNameOrEmail: 'ln',
+                                        password: 'testtest'
                                     },
                                     createdBy: createdBy
                                 });
 
-                            case 7:
+                            case 5:
                                 authToken = _context8.sent;
 
-                                (0, _ptzAssert.ok)(authToken.authToken, 'Empty Token');
+                                (0, _ptzAssert.ok)(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
+                                (0, _ptzAssert.notOk)(authToken.authToken, 'Do NOT Generate token');
+                                (0, _ptzAssert.notOk)(authToken.user, 'DO NOT return user');
+                                (0, _ptzAssert.notEmptyArray)(authToken.errors, 'return errors');
 
-                            case 9:
+                            case 10:
                             case 'end':
                                 return _context8.stop();
                         }
@@ -345,15 +334,64 @@ describe('UserApp', function () {
                 }, _callee8, this);
             }));
         });
-        describe('invalid password', function () {
+        it('add error when invalid password', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee9() {
-                var authToken;
+                var userRepository, userApp, authToken;
                 return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
                         switch (_context9.prev = _context9.next) {
                             case 0:
-                                (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(null);
-                                _context9.next = 3;
+                                userRepository = new _UserRepositoryFake2.default(null);
+                                userApp = new _userApp2.default({ userRepository: userRepository });
+
+                                (0, _sinon.spy)(userRepository, 'getByUserNameOrEmail');
+                                _context9.next = 5;
+                                return userApp.getAuthToken({
+                                    form: {
+                                        userNameOrEmail: 'angeloocana',
+                                        password: 't'
+                                    },
+                                    createdBy: createdBy
+                                });
+
+                            case 5:
+                                authToken = _context9.sent;
+
+                                (0, _ptzAssert.ok)(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
+                                (0, _ptzAssert.notOk)(authToken.authToken, 'Do NOT Generate token');
+                                (0, _ptzAssert.notOk)(authToken.user, 'DO NOT return user');
+                                (0, _ptzAssert.notEmptyArray)(authToken.errors, 'return errors');
+
+                            case 10:
+                            case 'end':
+                                return _context9.stop();
+                        }
+                    }
+                }, _callee9, this);
+            }));
+        });
+        it('generate token when correct password', function () {
+            return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee10() {
+                var userRepository, userApp, user, authToken;
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                    while (1) {
+                        switch (_context10.prev = _context10.next) {
+                            case 0:
+                                userRepository = new _UserRepositoryFake2.default(null);
+                                userApp = new _userApp2.default({ userRepository: userRepository });
+                                user = new _ptzUserDomain.User({
+                                    userName: 'lnsilva',
+                                    email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
+                                    password: '123456'
+                                });
+                                _context10.next = 5;
+                                return userApp.hashPassword(user);
+
+                            case 5:
+                                user = _context10.sent;
+
+                                (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
+                                _context10.next = 9;
                                 return userApp.getAuthToken({
                                     form: {
                                         userNameOrEmail: 'lnsilva',
@@ -362,25 +400,55 @@ describe('UserApp', function () {
                                     createdBy: createdBy
                                 });
 
-                            case 3:
-                                authToken = _context9.sent;
+                            case 9:
+                                authToken = _context10.sent;
 
-                                it('do not generate token', function () {
-                                    (0, _ptzAssert.notOk)(authToken.authToken);
-                                });
-                                it('do not return user', function () {
-                                    (0, _ptzAssert.notOk)(authToken.user);
-                                });
-                                it('return invalid userName, email or password error', function () {
-                                    (0, _ptzAssert.contains)(authToken.errors, _ptzUserDomain.errors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);
-                                });
+                                (0, _ptzAssert.ok)(authToken.authToken, 'Empty Token');
+                                (0, _ptzAssert.ok)(authToken.user, 'no user');
+                                (0, _ptzAssert.ok)(authToken.user.id, 'no user id');
+                                (0, _ptzAssert.emptyArray)(authToken.errors, 'return errors');
 
-                            case 7:
+                            case 14:
                             case 'end':
-                                return _context9.stop();
+                                return _context10.stop();
                         }
                     }
-                }, _callee9, this);
+                }, _callee10, this);
+            }));
+        });
+        it('add errors when incorrect password', function () {
+            return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee11() {
+                var userRepository, userApp, authToken;
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                    while (1) {
+                        switch (_context11.prev = _context11.next) {
+                            case 0:
+                                userRepository = new _UserRepositoryFake2.default(null);
+                                userApp = new _userApp2.default({ userRepository: userRepository });
+
+                                (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(null);
+                                _context11.next = 5;
+                                return userApp.getAuthToken({
+                                    form: {
+                                        userNameOrEmail: 'lnsilva',
+                                        password: '123456'
+                                    },
+                                    createdBy: createdBy
+                                });
+
+                            case 5:
+                                authToken = _context11.sent;
+
+                                (0, _ptzAssert.notOk)(authToken.authToken, 'do not generate token');
+                                (0, _ptzAssert.notOk)(authToken.user, 'do not return user');
+                                (0, _ptzAssert.contains)(authToken.errors, _ptzUserDomain.errors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD, 'return invalid userName, email or password error');
+
+                            case 9:
+                            case 'end':
+                                return _context11.stop();
+                        }
+                    }
+                }, _callee11, this);
             }));
         });
     });
@@ -391,27 +459,27 @@ describe('UserApp', function () {
             userApp = new _userApp2.default({ userRepository: userRepository });
         });
         it('Invalid token throws exception', function () {
-            return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee10() {
+            return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee12() {
                 var hasError;
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
                     while (1) {
-                        switch (_context10.prev = _context10.next) {
+                        switch (_context12.prev = _context12.next) {
                             case 0:
                                 hasError = false;
-                                _context10.prev = 1;
-                                _context10.next = 4;
+                                _context12.prev = 1;
+                                _context12.next = 4;
                                 return userApp.verifyAuthToken({
                                     token: 'Invalid_Token',
                                     createdBy: createdBy
                                 });
 
                             case 4:
-                                _context10.next = 9;
+                                _context12.next = 9;
                                 break;
 
                             case 6:
-                                _context10.prev = 6;
-                                _context10.t0 = _context10['catch'](1);
+                                _context12.prev = 6;
+                                _context12.t0 = _context12['catch'](1);
 
                                 hasError = true;
 
@@ -420,18 +488,18 @@ describe('UserApp', function () {
 
                             case 10:
                             case 'end':
-                                return _context10.stop();
+                                return _context12.stop();
                         }
                     }
-                }, _callee10, this, [[1, 6]]);
+                }, _callee12, this, [[1, 6]]);
             }));
         });
         it('Valid token return user', function () {
-            return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee11() {
+            return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee13() {
                 var user, authToken, userByToken;
-                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
                     while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context13.prev = _context13.next) {
                             case 0:
                                 user = new _ptzUserDomain.User({
                                     userName: 'lnsilva',
@@ -439,14 +507,14 @@ describe('UserApp', function () {
                                     displayName: 'Lucas Neris',
                                     password: '123456'
                                 });
-                                _context11.next = 3;
+                                _context13.next = 3;
                                 return userApp.hashPassword(user);
 
                             case 3:
-                                user = _context11.sent;
+                                user = _context13.sent;
 
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
-                                _context11.next = 7;
+                                _context13.next = 7;
                                 return userApp.getAuthToken({
                                     form: {
                                         userNameOrEmail: 'lnsilva',
@@ -456,17 +524,17 @@ describe('UserApp', function () {
                                 });
 
                             case 7:
-                                authToken = _context11.sent;
+                                authToken = _context13.sent;
 
                                 (0, _ptzAssert.ok)(authToken.authToken, 'Empty Token');
-                                _context11.next = 11;
+                                _context13.next = 11;
                                 return userApp.verifyAuthToken({
                                     token: authToken.authToken,
                                     createdBy: createdBy
                                 });
 
                             case 11:
-                                userByToken = _context11.sent;
+                                userByToken = _context13.sent;
 
                                 (0, _ptzAssert.equal)(userByToken.id, user.id, 'User Id dont match');
                                 (0, _ptzAssert.equal)(userByToken.email, user.email, 'User Id dont match');
@@ -475,10 +543,10 @@ describe('UserApp', function () {
 
                             case 16:
                             case 'end':
-                                return _context11.stop();
+                                return _context13.stop();
                         }
                     }
-                }, _callee11, this);
+                }, _callee13, this);
             }));
         });
     });

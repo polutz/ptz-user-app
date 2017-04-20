@@ -178,7 +178,7 @@ var UserApp = function (_BaseApp) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                form = new _ptzUserDomain.AuthenticateUserForm(args.form);
+                                form = args.form;
                                 _context3.next = 3;
                                 return this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
 
@@ -212,17 +212,31 @@ var UserApp = function (_BaseApp) {
         key: 'getAuthToken',
         value: function getAuthToken(args) {
             return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee4() {
-                var user, authToken, errors;
+                var form, authToken, user, errors;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
-                                _context4.next = 2;
+                                form = new _ptzUserDomain.AuthenticateUserForm(args.form);
+                                authToken = null;
+
+                                if (form.isValid()) {
+                                    _context4.next = 4;
+                                    break;
+                                }
+
+                                return _context4.abrupt('return', Promise.resolve({
+                                    authToken: authToken,
+                                    user: null,
+                                    errors: form.errors
+                                }));
+
+                            case 4:
+                                _context4.next = 6;
                                 return this.authenticateUser(args);
 
-                            case 2:
+                            case 6:
                                 user = _context4.sent;
-                                authToken = null;
                                 errors = [];
 
                                 if (user == null) errors.push(_ptzUserDomain.errors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);else authToken = (0, _jwtSimple.encode)(user, this.tokenSecret);
@@ -232,7 +246,7 @@ var UserApp = function (_BaseApp) {
                                     errors: errors
                                 }));
 
-                            case 7:
+                            case 10:
                             case 'end':
                                 return _context4.stop();
                         }

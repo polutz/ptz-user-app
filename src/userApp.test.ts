@@ -6,10 +6,12 @@ import {
     emptyArray,
     equal,
     notContains,
+    notEmptyArray,
     notOk,
     ok,
     throws
 } from 'ptz-assert';
+import log from 'ptz-log';
 import { errors as allErrors, ICreatedBy, IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
 import { spy, stub } from 'sinon';
 import UserApp from './userApp';
@@ -19,6 +21,8 @@ const createdBy: ICreatedBy = {
     dtCreated: new Date(),
     ip: ''
 };
+
+const notCalled = 'notCalled';
 
 describe('UserApp', () => {
     describe('save', () => {
@@ -55,7 +59,6 @@ describe('UserApp', () => {
                 displayName: ''
             };
             await userApp.save({ userArgs, createdBy });
-            const notCalled = 'notCalled';
             ok(userRepository.save[notCalled]);
         });
 
@@ -157,15 +160,49 @@ describe('UserApp', () => {
     });
 
     describe('getAuthToken', () => {
-        var userApp: IUserApp,
-            userRepository: IUserRepository;
+        it('add errors when invalid userName or Email', async () => {
+            const userRepository = new UserRepositoryFake(null);
+            const userApp = new UserApp({ userRepository });
 
-        beforeEach(() => {
-            userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp({ userRepository });
+            spy(userRepository, 'getByUserNameOrEmail');
+            const authToken = await userApp.getAuthToken({
+                form: {
+                    userNameOrEmail: 'ln',
+                    password: 'testtest'
+                },
+                createdBy
+            });
+
+            ok(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
+            notOk(authToken.authToken, 'Do NOT Generate token');
+            notOk(authToken.user, 'DO NOT return user');
+            notEmptyArray(authToken.errors, 'return errors');
         });
 
-        it('When user is valid password generate token', async () => {
+        it('add error when invalid password', async () => {
+            const userRepository = new UserRepositoryFake(null);
+            const userApp = new UserApp({ userRepository });
+
+            spy(userRepository, 'getByUserNameOrEmail');
+
+            const authToken = await userApp.getAuthToken({
+                form: {
+                    userNameOrEmail: 'angeloocana',
+                    password: 't'
+                },
+                createdBy
+            });
+
+            ok(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
+            notOk(authToken.authToken, 'Do NOT Generate token');
+            notOk(authToken.user, 'DO NOT return user');
+            notEmptyArray(authToken.errors, 'return errors');
+        });
+
+        it('generate token when correct password', async () => {
+            const userRepository = new UserRepositoryFake(null);
+            const userApp = new UserApp({ userRepository });
+
             var user: IUser = new User({
                 userName: 'lnsilva'
                 , email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
@@ -184,9 +221,15 @@ describe('UserApp', () => {
             });
 
             ok(authToken.authToken, 'Empty Token');
+            ok(authToken.user, 'no user');
+            ok(authToken.user.id, 'no user id');
+            emptyArray(authToken.errors, 'return errors');
         });
 
-        describe('invalid password', async () => {
+        it('add errors when incorrect password', async () => {
+            const userRepository = new UserRepositoryFake(null);
+            const userApp = new UserApp({ userRepository });
+
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
             const authToken = await userApp.getAuthToken({
@@ -197,17 +240,11 @@ describe('UserApp', () => {
                 createdBy
             });
 
-            it('do not generate token', () => {
-                notOk(authToken.authToken);
-            });
-
-            it('do not return user', () => {
-                notOk(authToken.user);
-            });
-
-            it('return invalid userName, email or password error', () => {
-                contains(authToken.errors, allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);
-            });
+            notOk(authToken.authToken, 'do not generate token');
+            notOk(authToken.user, 'do not return user');
+            contains(authToken.errors,
+                allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD,
+                'return invalid userName, email or password error');
         });
     });
 

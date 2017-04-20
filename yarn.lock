@@ -2039,8 +2039,8 @@ pseudomap@^1.0.1:
   resolved "https://registry.yarnpkg.com/pseudomap/-/pseudomap-1.0.2.tgz#f052a28da70e618917ef0a8ac34c1ae5a68286b3"
 
 ptz-assert@^1.6.3:
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/ptz-assert/-/ptz-assert-1.6.5.tgz#9eafca7cfabf2ae4660fbb3de4c70c97d165529a"
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/ptz-assert/-/ptz-assert-1.6.6.tgz#4f5851e18c7228b78d0239a33d690a7ad44b49e7"
   dependencies:
     assert "^1.4.1"
 
@@ -2065,8 +2065,8 @@ ptz-log@^1.0.0:
     moment "^2.18.1"
 
 ptz-user-domain@^1.1.4:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/ptz-user-domain/-/ptz-user-domain-1.5.1.tgz#568f3b8fb8ee3b1c3cdd394813322afa80fafa97"
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/ptz-user-domain/-/ptz-user-domain-1.5.2.tgz#0fe862fcb786db544ab102a49267df1a64bb1494"
   dependencies:
     ptz-core-domain "^1.1.4"
 
@@ -2597,8 +2597,8 @@ type-check@~0.3.2:
     prelude-ls "~1.1.2"
 
 type-detect@^4.0.0:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-4.0.1.tgz#c2473c08dc6f975232ca7e3317570f187bf7f3e2"
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-4.0.2.tgz#60e134a1b49bde16c08ce265e596059351d74852"
 
 typescript@^2.2.2:
   version "2.3.0"
