@@ -5,21 +5,19 @@ import {
     contains,
     emptyArray,
     equal,
-    notContains,
     notEmptyArray,
     notOk,
-    ok,
-    throws
+    ok
 } from 'ptz-assert';
-import log from 'ptz-log';
-import { errors as allErrors, ICreatedBy, IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
+
+import { allErrors, ICreatedBy, IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
 import { spy, stub } from 'sinon';
 import UserApp from './userApp';
 import UserRepositoryFake from './UserRepositoryFake';
 
-const createdBy: ICreatedBy = {
+const authedUser: ICreatedBy = {
     dtCreated: new Date(),
-    ip: ''
+    ip: '192.161.0.1'
 };
 
 const notCalled = 'notCalled';
@@ -46,7 +44,7 @@ describe('UserApp', () => {
                 password: 'testPassword'
             };
 
-            const user = await userApp.save({ userArgs, createdBy });
+            const user = await userApp.saveUser({ userArgs, authedUser });
 
             ok(user.passwordHash, 'passwordHash not set');
             notOk(user.password, 'password not empty');
@@ -58,7 +56,7 @@ describe('UserApp', () => {
                 email: '',
                 displayName: ''
             };
-            await userApp.save({ userArgs, createdBy });
+            await userApp.saveUser({ userArgs, authedUser });
             ok(userRepository.save[notCalled]);
         });
 
@@ -66,9 +64,9 @@ describe('UserApp', () => {
             const userArgs: IUserArgs = {
                 userName: 'angeloocana',
                 email: 'angeloocana@gmail.com',
-                displayName: ''
+                displayName: 'Angelo Ocana'
             };
-            await userApp.save({ userArgs, createdBy });
+            await userApp.saveUser({ userArgs, authedUser });
             const calledOnce = 'calledOnce';
             ok(userRepository.save[calledOnce]);
         });
@@ -79,12 +77,12 @@ describe('UserApp', () => {
                 email: 'angeloocana@gmail.com',
                 displayName: ''
             };
-            const user = await userApp.save({ userArgs, createdBy });
-            equal(user.createdBy, createdBy);
+            const user = await userApp.saveUser({ userArgs, authedUser });
+            equal(user.createdBy, authedUser);
         });
     });
 
-    describe('authenticateUser', () => {
+    describe('authUser', () => {
         var userApp: IUserApp,
             userRepository: IUserRepository;
 
@@ -93,21 +91,21 @@ describe('UserApp', () => {
             userApp = new UserApp({ userRepository });
         });
 
-        it('User not found should return null', async () => {
+        it('return null when User not found', async () => {
             const userNameOrEmail = 'angeloocana',
                 password = 'teste';
 
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
-            const user = await userApp.authenticateUser({
+            const user = await userApp.authUser({
                 form: { userNameOrEmail, password },
-                createdBy
+                authedUser
             });
 
             notOk(user);
         });
 
-        it('User found but incorrect password should return null', async () => {
+        it('return null when User found but incorrect password', async () => {
             const password = 'testeteste';
 
             var user: IUser = new User({
@@ -121,24 +119,24 @@ describe('UserApp', () => {
 
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
-            user = await userApp.authenticateUser({
+            user = await userApp.authUser({
                 form: {
                     userNameOrEmail: user.userName,
                     password: 'incorrectPassword'
                 },
-                createdBy
+                authedUser
             });
 
             notOk(user);
         });
 
-        it('User found and correct password should return the user', async () => {
+        it('return user when correct password', async () => {
             const password = 'testeteste';
 
             var user: IUser = new User({
                 userName: 'angeloocana',
                 email: 'alanmarcell@live.com',
-                displayName: '',
+                displayName: 'Angelo Ocana',
                 password
             });
 
@@ -146,12 +144,12 @@ describe('UserApp', () => {
 
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
 
-            user = await userApp.authenticateUser({
+            user = await userApp.authUser({
                 form: {
                     userNameOrEmail: user.userName,
                     password
                 },
-                createdBy
+                authedUser
             });
 
             ok(user);
@@ -170,7 +168,7 @@ describe('UserApp', () => {
                     userNameOrEmail: 'ln',
                     password: 'testtest'
                 },
-                createdBy
+                authedUser
             });
 
             ok(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
@@ -190,7 +188,7 @@ describe('UserApp', () => {
                     userNameOrEmail: 'angeloocana',
                     password: 't'
                 },
-                createdBy
+                authedUser
             });
 
             ok(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
@@ -217,7 +215,7 @@ describe('UserApp', () => {
                     userNameOrEmail: 'lnsilva',
                     password: '123456'
                 },
-                createdBy
+                authedUser
             });
 
             ok(authToken.authToken, 'Empty Token');
@@ -237,7 +235,7 @@ describe('UserApp', () => {
                     userNameOrEmail: 'lnsilva',
                     password: '123456'
                 },
-                createdBy
+                authedUser
             });
 
             notOk(authToken.authToken, 'do not generate token');
@@ -262,7 +260,7 @@ describe('UserApp', () => {
             try {
                 await userApp.verifyAuthToken({
                     token: 'Invalid_Token',
-                    createdBy
+                    authedUser
                 });
             } catch (err) {
                 hasError = true;
@@ -286,14 +284,14 @@ describe('UserApp', () => {
                     userNameOrEmail: 'lnsilva',
                     password: '123456'
                 },
-                createdBy
+                authedUser
             });
 
             ok(authToken.authToken, 'Empty Token');
 
             const userByToken = await userApp.verifyAuthToken({
                 token: authToken.authToken,
-                createdBy
+                authedUser
             });
 
             equal(userByToken.id, user.id, 'User Id dont match');

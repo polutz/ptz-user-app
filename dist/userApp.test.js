@@ -47,9 +47,9 @@ var __awaiter = undefined && undefined.__awaiter || function (thisArg, _argument
 
 _dotenv2.default.config();
 
-var createdBy = {
+var authedUser = {
     dtCreated: new Date(),
-    ip: ''
+    ip: '192.161.0.1'
 };
 var notCalled = 'notCalled';
 describe('UserApp', function () {
@@ -75,7 +75,7 @@ describe('UserApp', function () {
                                     password: 'testPassword'
                                 };
                                 _context.next = 3;
-                                return userApp.save({ userArgs: userArgs, createdBy: createdBy });
+                                return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
 
                             case 3:
                                 user = _context.sent;
@@ -104,7 +104,7 @@ describe('UserApp', function () {
                                     displayName: ''
                                 };
                                 _context2.next = 3;
-                                return userApp.save({ userArgs: userArgs, createdBy: createdBy });
+                                return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
 
                             case 3:
                                 (0, _ptzAssert.ok)(userRepository.save[notCalled]);
@@ -127,10 +127,10 @@ describe('UserApp', function () {
                                 userArgs = {
                                     userName: 'angeloocana',
                                     email: 'angeloocana@gmail.com',
-                                    displayName: ''
+                                    displayName: 'Angelo Ocana'
                                 };
                                 _context3.next = 3;
-                                return userApp.save({ userArgs: userArgs, createdBy: createdBy });
+                                return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
 
                             case 3:
                                 calledOnce = 'calledOnce';
@@ -158,12 +158,12 @@ describe('UserApp', function () {
                                     displayName: ''
                                 };
                                 _context4.next = 3;
-                                return userApp.save({ userArgs: userArgs, createdBy: createdBy });
+                                return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
 
                             case 3:
                                 user = _context4.sent;
 
-                                (0, _ptzAssert.equal)(user.createdBy, createdBy);
+                                (0, _ptzAssert.equal)(user.createdBy, authedUser);
 
                             case 5:
                             case 'end':
@@ -174,13 +174,13 @@ describe('UserApp', function () {
             }));
         });
     });
-    describe('authenticateUser', function () {
+    describe('authUser', function () {
         var userApp, userRepository;
         beforeEach(function () {
             userRepository = new _UserRepositoryFake2.default(null);
             userApp = new _userApp2.default({ userRepository: userRepository });
         });
-        it('User not found should return null', function () {
+        it('return null when User not found', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee5() {
                 var userNameOrEmail, password, user;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
@@ -191,9 +191,9 @@ describe('UserApp', function () {
 
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(null);
                                 _context5.next = 4;
-                                return userApp.authenticateUser({
+                                return userApp.authUser({
                                     form: { userNameOrEmail: userNameOrEmail, password: password },
-                                    createdBy: createdBy
+                                    authedUser: authedUser
                                 });
 
                             case 4:
@@ -209,7 +209,7 @@ describe('UserApp', function () {
                 }, _callee5, this);
             }));
         });
-        it('User found but incorrect password should return null', function () {
+        it('return null when User found but incorrect password', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee6() {
                 var password, user;
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
@@ -231,12 +231,12 @@ describe('UserApp', function () {
 
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
                                 _context6.next = 8;
-                                return userApp.authenticateUser({
+                                return userApp.authUser({
                                     form: {
                                         userNameOrEmail: user.userName,
                                         password: 'incorrectPassword'
                                     },
-                                    createdBy: createdBy
+                                    authedUser: authedUser
                                 });
 
                             case 8:
@@ -252,7 +252,7 @@ describe('UserApp', function () {
                 }, _callee6, this);
             }));
         });
-        it('User found and correct password should return the user', function () {
+        it('return user when correct password', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee7() {
                 var password, user;
                 return regeneratorRuntime.wrap(function _callee7$(_context7) {
@@ -263,7 +263,7 @@ describe('UserApp', function () {
                                 user = new _ptzUserDomain.User({
                                     userName: 'angeloocana',
                                     email: 'alanmarcell@live.com',
-                                    displayName: '',
+                                    displayName: 'Angelo Ocana',
                                     password: password
                                 });
                                 _context7.next = 4;
@@ -274,12 +274,12 @@ describe('UserApp', function () {
 
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
                                 _context7.next = 8;
-                                return userApp.authenticateUser({
+                                return userApp.authUser({
                                     form: {
                                         userNameOrEmail: user.userName,
                                         password: password
                                     },
-                                    createdBy: createdBy
+                                    authedUser: authedUser
                                 });
 
                             case 8:
@@ -315,7 +315,7 @@ describe('UserApp', function () {
                                         userNameOrEmail: 'ln',
                                         password: 'testtest'
                                     },
-                                    createdBy: createdBy
+                                    authedUser: authedUser
                                 });
 
                             case 5:
@@ -351,7 +351,7 @@ describe('UserApp', function () {
                                         userNameOrEmail: 'angeloocana',
                                         password: 't'
                                     },
-                                    createdBy: createdBy
+                                    authedUser: authedUser
                                 });
 
                             case 5:
@@ -397,7 +397,7 @@ describe('UserApp', function () {
                                         userNameOrEmail: 'lnsilva',
                                         password: '123456'
                                     },
-                                    createdBy: createdBy
+                                    authedUser: authedUser
                                 });
 
                             case 9:
@@ -433,7 +433,7 @@ describe('UserApp', function () {
                                         userNameOrEmail: 'lnsilva',
                                         password: '123456'
                                     },
-                                    createdBy: createdBy
+                                    authedUser: authedUser
                                 });
 
                             case 5:
@@ -441,7 +441,7 @@ describe('UserApp', function () {
 
                                 (0, _ptzAssert.notOk)(authToken.authToken, 'do not generate token');
                                 (0, _ptzAssert.notOk)(authToken.user, 'do not return user');
-                                (0, _ptzAssert.contains)(authToken.errors, _ptzUserDomain.errors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD, 'return invalid userName, email or password error');
+                                (0, _ptzAssert.contains)(authToken.errors, _ptzUserDomain.allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD, 'return invalid userName, email or password error');
 
                             case 9:
                             case 'end':
@@ -470,7 +470,7 @@ describe('UserApp', function () {
                                 _context12.next = 4;
                                 return userApp.verifyAuthToken({
                                     token: 'Invalid_Token',
-                                    createdBy: createdBy
+                                    authedUser: authedUser
                                 });
 
                             case 4:
@@ -520,7 +520,7 @@ describe('UserApp', function () {
                                         userNameOrEmail: 'lnsilva',
                                         password: '123456'
                                     },
-                                    createdBy: createdBy
+                                    authedUser: authedUser
                                 });
 
                             case 7:
@@ -530,7 +530,7 @@ describe('UserApp', function () {
                                 _context13.next = 11;
                                 return userApp.verifyAuthToken({
                                     token: authToken.authToken,
-                                    createdBy: createdBy
+                                    authedUser: authedUser
                                 });
 
                             case 11:

@@ -9,7 +9,8 @@
     "sourceMap": true,
     "listFiles": false,
     "outDir": "dist/",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true
   },
   "include": [
     "typings/**/*.d.ts",

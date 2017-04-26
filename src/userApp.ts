@@ -2,25 +2,31 @@ import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
 import { BaseApp } from 'ptz-core-app';
 import {
-    AuthenticateUserForm,
-    errors as allErrors,
+    allErrors,
+    AuthUserForm,
     IAuthToken,
+    IAuthUserArgs,
     ICreatedBy,
+    IDeleteUserArgs,
+    IFindUsersArgs,
+    ISaveUserArgs,
+    IUpdatePasswordArgs,
+    IUpdatePasswordTokenArgs,
     IUser,
     IUserApp,
     IUserAppArgs,
-    IUserAppIAuthenticateUserArgs,
-    IUserAppIFindArgs,
-    IUserAppIGetAuthTokenArgs,
-    IUserAppISaveArgs,
-    IUserAppIVerifyAuthTokenArgs,
-    IUserArgs,
     IUserRepository,
+    IVerifyAuthTokenArgs,
     User,
     users
 } from 'ptz-user-domain';
 
 export default class UserApp extends BaseApp implements IUserApp {
+
+    static actions = {
+        SAVE: 'USER_APP_SAVE',
+        GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
+    };
 
     tokenSecret = process.env.PASSWORD_SALT;
     passwordSalt = process.env.PASSWORD_SALT;
@@ -30,6 +36,15 @@ export default class UserApp extends BaseApp implements IUserApp {
     constructor(userAppArgs: IUserAppArgs) {
         super(userAppArgs);
         this.userRepository = userAppArgs.userRepository;
+    }
+
+    async execAction(action) {
+        switch (action.type) {
+            case UserApp.actions.SAVE:
+                return await this.saveUser(action.args);
+            case UserApp.actions.GET_AUTH_TOKEN:
+                return await this.getAuthToken(action.args);
+        }
     }
 
     async hashPassword(user: IUser): Promise<IUser> {
@@ -45,10 +60,8 @@ export default class UserApp extends BaseApp implements IUserApp {
         return Promise.resolve(user);
     }
 
-    async save(args: IUserAppISaveArgs): Promise<IUser> {
-        this.log('UserApp.save args:', args);
-
-        args.userArgs.createdBy = args.createdBy;
+    async saveUser(args: ISaveUserArgs): Promise<IUser> {
+        args.userArgs.createdBy = args.authedUser;
         var user: IUser = new User(args.userArgs);
 
         user = await this.hashPassword(user);
@@ -68,15 +81,14 @@ export default class UserApp extends BaseApp implements IUserApp {
 
         user = await this.userRepository.save(user);
 
-        this.log('UserApp.save return:', user);
         return Promise.resolve(user);
     }
 
-    find(args: IUserAppIFindArgs): Promise<IUser[]> {
+    findUsers(args: IFindUsersArgs): Promise<IUser[]> {
         return this.userRepository.find(args.query, { limit: args.options.limit });
     }
 
-    async authenticateUser(args: IUserAppIAuthenticateUserArgs): Promise<IUser> {
+    async authUser(args: IAuthUserArgs): Promise<IUser> {
         const { form } = args;
         const user = await this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
 
@@ -87,8 +99,8 @@ export default class UserApp extends BaseApp implements IUserApp {
         return Promise.resolve(isPasswordCorrect ? user : null);
     }
 
-    async getAuthToken(args: IUserAppIGetAuthTokenArgs): Promise<IAuthToken> {
-        const form = new AuthenticateUserForm(args.form);
+    async getAuthToken(args: IAuthUserArgs): Promise<IAuthToken> {
+        const form = new AuthUserForm(args.form);
         var authToken = null;
 
         if (!form.isValid())
@@ -98,7 +110,7 @@ export default class UserApp extends BaseApp implements IUserApp {
                 errors: form.errors
             });
 
-        const user = await this.authenticateUser(args);
+        const user = await this.authUser(args);
 
         const errors = [];
 
@@ -114,14 +126,14 @@ export default class UserApp extends BaseApp implements IUserApp {
         });
     }
 
-    verifyAuthToken(args: IUserAppIVerifyAuthTokenArgs): Promise<User> {
+    verifyAuthToken(args: IVerifyAuthTokenArgs): Promise<User> {
         const user = decode(args.token, this.passwordSalt);
         return Promise.resolve(user);
     }
 
     async seed(): Promise<void> {
         this.log('seeding users', users.allUsers);
-        const createdBy: ICreatedBy = {
+        const authedUser: ICreatedBy = {
             ip: '',
             dtCreated: new Date(),
             user: {
@@ -132,6 +144,18 @@ export default class UserApp extends BaseApp implements IUserApp {
             }
         };
 
-        users.allUsers.forEach(async user => await this.save({ userArgs: user, createdBy }));
+        users.allUsers.forEach(async user => await this.saveUser({ userArgs: user, authedUser }));
+    }
+
+    async updatePassword(args: IUpdatePasswordArgs): Promise<boolean> {
+        return Promise.resolve(false);
+    }
+
+    async updatePasswordToken(args: IUpdatePasswordTokenArgs): Promise<boolean> {
+        return Promise.resolve(false);
+    }
+
+    async deleteUser(args: IDeleteUserArgs): Promise<boolean> {
+        return Promise.resolve(false);
     }
 }

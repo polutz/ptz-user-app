@@ -45,7 +45,8 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^4.0.0",
     "jwt-simple": "^0.5.1",
+    "ptz-action-domain": "file:///home/angeloocana/dev/polutz/ptz-action-domain",
     "ptz-core-app": "^1.0.0",
-    "ptz-user-domain": "^1.1.4"
+    "ptz-user-domain": "^1.8.0"
   }
 }

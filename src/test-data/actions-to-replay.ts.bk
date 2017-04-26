@@ -1,0 +1,99 @@
+import {
+    AuthUserForm, IAuthUserArgs,
+    IForgotPasswordArgs,
+    ISaveUserArgs, IUpdatePasswordArgs, IUpdatePasswordTokenArgs, User
+} from 'ptz-user-domain';
+
+import { allActions } from '../allActions';
+
+import { IAction } from 'ptz-action-domain';
+
+export const authedUser = {
+    ip: '192.161.0.1',
+    dtCreated: new Date()
+};
+
+export const createUserAngeloOcana: IAction<ISaveUserArgs> = {
+    actionType: allActions.SAVE_USER,
+    args: {
+        userArgs: new User({
+            displayName: 'Ângelo Ocanã',
+            email: 'angeloocana@gmail.com',
+            userName: 'angeloocana',
+            password: 'testtest'
+        }),
+        authedUser
+    }
+};
+
+export const authUserAngeloOcana: IAction<IAuthUserArgs> = {
+    actionType: allActions.AUTH_USER,
+    args: {
+        authedUser,
+        form: new AuthUserForm({
+            userNameOrEmail: 'angeloocana',
+            password: 'testtest'
+        })
+    }
+};
+
+export const failAuthUserAngeloOcana: IAction<IAuthUserArgs> = {
+    actionType: allActions.AUTH_USER,
+    args: {
+        authedUser,
+        form: new AuthUserForm({
+            userNameOrEmail: 'angeloocana',
+            password: 'blablabla'
+        })
+    }
+};
+
+export const updateUserAngeloOcana: IAction<ISaveUserArgs> = {
+    actionType: allActions.SAVE_USER,
+    args: {
+        authedUser,
+        userArgs: new User({
+            displayName: '_2_Ângelo Ocanã',
+            email: '_2_angeloocana@gmail.com',
+            userName: '_2_angeloocana'
+        })
+    }
+};
+
+export const forgotPasswordAngeloOcana: IAction<IForgotPasswordArgs> = {
+    actionType: allActions.FORGOT_PASSWORD,
+    args: {
+        authedUser,
+        userNameOrEmail: 'angeloocana'
+    }
+};
+
+export const updatePasswordTokenAngeloOcana: IAction<IUpdatePasswordTokenArgs> = {
+    actionType: allActions.FORGOT_PASSWORD,
+    args: {
+        authedUser,
+        token: 'FIND_SOME_WAY_TO_GET_THIS_TOKEN',
+        newPasword: 'adminadmin'
+    }
+};
+
+export const updatePasswordAngeloOcana: IAction<IUpdatePasswordArgs> = {
+    actionType: allActions.FORGOT_PASSWORD,
+    args: {
+        authedUser,
+        currentPasword: 'adminadmin',
+        newPasword: 'testtest'
+    }
+};
+
+export const actionsQueue = [
+    createUserAngeloOcana,
+    authUserAngeloOcana,
+    updateUserAngeloOcana,
+    failAuthUserAngeloOcana,
+    forgotPasswordAngeloOcana,
+    updatePasswordTokenAngeloOcana,
+    updatePasswordAngeloOcana
+];
+
+export default actionsQueue;
