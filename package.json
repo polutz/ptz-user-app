@@ -7,12 +7,13 @@
   "scripts": {
     "lint": "tslint ./src/**/*.ts ./src/**/*.test.ts ./src/**/*.d.ts",
     "js": "rimraf dist-es6 && tsc && rimraf dist && babel dist-es6 -d dist --presets es2015 --source-maps",
-    "pretest": "npm-run-all --parallel js lint",
+    "pretest": "npm-run-all --parallel js lint gensalt",
     "mocha": "mocha ./dist/**/*.js --require babel-polyfill",
     "test": "nyc npm run mocha && nyc report --reporter=html --reporter=text-lcov > coverage.lcov && f() { EXIT=0; codecov --token=b1c7616b-9a84-436e-9329-50273c9d72db || exit $EXIT; }; f",
     "test:cover": "npm run test && opn ./coverage/lcov-report/index.html",
     "predebug": "npm run pretest",
-    "debug": "node --nolazy --debug-brk=5858 dist/index.js"
+    "debug": "node --nolazy --debug-brk=5858 dist/index.js",
+    "gensalt": "node gensalt.js"
   },
   "repository": {
     "type": "git",
