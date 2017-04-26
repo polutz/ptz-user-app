@@ -10,9 +10,7 @@ var _ptzUserDomain = require('ptz-user-domain');
 
 var _sinon = require('sinon');
 
-var _userApp = require('./userApp');
-
-var _userApp2 = _interopRequireDefault(_userApp);
+var _index = require('./index');
 
 var _UserRepositoryFake = require('./UserRepositoryFake');
 
@@ -59,7 +57,7 @@ describe('UserApp', function () {
             userRepository = new _UserRepositoryFake2.default(null);
             (0, _sinon.spy)(userRepository, 'save');
             (0, _sinon.stub)(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
-            userApp = new _userApp2.default({ userRepository: userRepository });
+            userApp = new _index.UserApp({ userRepository: userRepository });
         });
         it('hash password', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee() {
@@ -178,7 +176,7 @@ describe('UserApp', function () {
         var userApp, userRepository;
         beforeEach(function () {
             userRepository = new _UserRepositoryFake2.default(null);
-            userApp = new _userApp2.default({ userRepository: userRepository });
+            userApp = new _index.UserApp({ userRepository: userRepository });
         });
         it('return null when User not found', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee5() {
@@ -306,7 +304,7 @@ describe('UserApp', function () {
                         switch (_context8.prev = _context8.next) {
                             case 0:
                                 userRepository = new _UserRepositoryFake2.default(null);
-                                userApp = new _userApp2.default({ userRepository: userRepository });
+                                userApp = new _index.UserApp({ userRepository: userRepository });
 
                                 (0, _sinon.spy)(userRepository, 'getByUserNameOrEmail');
                                 _context8.next = 5;
@@ -342,7 +340,7 @@ describe('UserApp', function () {
                         switch (_context9.prev = _context9.next) {
                             case 0:
                                 userRepository = new _UserRepositoryFake2.default(null);
-                                userApp = new _userApp2.default({ userRepository: userRepository });
+                                userApp = new _index.UserApp({ userRepository: userRepository });
 
                                 (0, _sinon.spy)(userRepository, 'getByUserNameOrEmail');
                                 _context9.next = 5;
@@ -378,7 +376,7 @@ describe('UserApp', function () {
                         switch (_context10.prev = _context10.next) {
                             case 0:
                                 userRepository = new _UserRepositoryFake2.default(null);
-                                userApp = new _userApp2.default({ userRepository: userRepository });
+                                userApp = new _index.UserApp({ userRepository: userRepository });
                                 user = new _ptzUserDomain.User({
                                     userName: 'lnsilva',
                                     email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
@@ -424,7 +422,7 @@ describe('UserApp', function () {
                         switch (_context11.prev = _context11.next) {
                             case 0:
                                 userRepository = new _UserRepositoryFake2.default(null);
-                                userApp = new _userApp2.default({ userRepository: userRepository });
+                                userApp = new _index.UserApp({ userRepository: userRepository });
 
                                 (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(null);
                                 _context11.next = 5;
@@ -456,7 +454,7 @@ describe('UserApp', function () {
         var userApp, userRepository;
         beforeEach(function () {
             userRepository = new _UserRepositoryFake2.default(null);
-            userApp = new _userApp2.default({ userRepository: userRepository });
+            userApp = new _index.UserApp({ userRepository: userRepository });
         });
         it('Invalid token throws exception', function () {
             return __awaiter(undefined, void 0, void 0, regeneratorRuntime.mark(function _callee12() {
@@ -551,4 +549,5 @@ describe('UserApp', function () {
         });
     });
 });
+//# sourceMappingURL=userApp.test.js.map
 //# sourceMappingURL=userApp.test.js.map

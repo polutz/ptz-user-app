@@ -1,1 +1,1 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA,OAAO,OAAO,MAAM,WAAW,CAAC;AAEhC,OAAM,EACF,OAAO,EACV,CAAC"}
+{"version":3,"sources":["../dist-es6/index.js"],"names":["UserApp"],"mappings":";;;;;;;AAAA;;;;;;QACSA,O;AACT","file":"index.js","sourcesContent":["import UserApp from './userApp';\nexport { UserApp };\n//# sourceMappingURL=index.js.map"]}

@@ -409,3 +409,4 @@ UserApp.actions = {
     GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
 };
 //# sourceMappingURL=userApp.js.map
+//# sourceMappingURL=userApp.js.map

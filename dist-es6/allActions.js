@@ -1,9 +1,4 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-var allActions = exports.allActions = {
+export const allActions = {
     SAVE_USER: 'SAVE_USER',
     DELETE_USER: 'DELETE_USER',
     AUTH_USER: 'AUTH_USER',
@@ -11,5 +6,4 @@ var allActions = exports.allActions = {
     UPDATE_PASSWORD_TOKEN: 'UPDATE_PASSWORD_BY_TOKEN',
     UPDATE_PASSWORD: 'UPDATE_PASSWORD'
 };
-//# sourceMappingURL=allActions.js.map
 //# sourceMappingURL=allActions.js.map

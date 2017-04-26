@@ -41,3 +41,4 @@ var UserRepositoryFake = function (_BaseRepositoryFake) {
 
 
 exports.default = UserRepositoryFake;
+//# sourceMappingURL=UserRepositoryFake.js.map
