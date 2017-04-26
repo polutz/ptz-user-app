@@ -2105,12 +2105,6 @@ pseudomap@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/pseudomap/-/pseudomap-1.0.2.tgz#f052a28da70e618917ef0a8ac34c1ae5a68286b3"
 
-"ptz-action-domain@file:///home/angeloocana/dev/polutz/ptz-action-domain":
-  version "1.0.0"
-  dependencies:
-    ptz-core-domain "^1.3.3"
-    ptz-log "^1.0.0"
-
 ptz-assert@^1.6.3:
   version "1.6.7"
   resolved "https://registry.yarnpkg.com/ptz-assert/-/ptz-assert-1.6.7.tgz#eb3eca22b7b00361f04e7815566b991b83f59a0b"
@@ -2124,7 +2118,7 @@ ptz-core-app@^1.0.0:
     ptz-core-domain "^1.2.0"
     ptz-log "^1.0.0"
 
-ptz-core-domain@^1.1.4, ptz-core-domain@^1.2.0, ptz-core-domain@^1.3.3:
+ptz-core-domain@^1.1.4, ptz-core-domain@^1.2.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/ptz-core-domain/-/ptz-core-domain-1.5.0.tgz#3fd73d5b489501b4da5d04d4e87a40597579bec2"
   dependencies:
