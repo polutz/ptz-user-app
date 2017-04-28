@@ -20,7 +20,8 @@ const authedUser: ICreatedBy = {
     ip: '192.161.0.1'
 };
 
-const notCalled = 'notCalled';
+const calledOnce = 'calledOnce',
+    notCalled = 'notCalled';
 
 describe('UserApp', () => {
     describe('saveUser', () => {
@@ -68,7 +69,6 @@ describe('UserApp', () => {
                     displayName: 'Angelo Ocana'
                 };
                 await userApp.saveUser({ userArgs, authedUser });
-                const calledOnce = 'calledOnce';
                 ok(userRepository.save[calledOnce]);
             });
 
@@ -107,7 +107,6 @@ describe('UserApp', () => {
                 };
 
                 const userSaved = await userApp.saveUser({ userArgs, authedUser });
-                const calledOnce = 'calledOnce';
                 ok(userRepository.save[calledOnce]);
                 equal(userSaved.displayName, userArgs.displayName);
             });
@@ -355,7 +354,23 @@ describe('UserApp', () => {
     });
 
     describe('findUsers', () => {
-        it('find');
+        it('call repository', () => {
+            const userRepository = new UserRepositoryFake(null);
+
+            const dbUsers = [];
+            stub(userRepository, 'find').returns(dbUsers);
+
+            const userApp = new UserApp({ userRepository });
+
+            const query = {};
+
+            const options = { limit: 4 };
+
+            const users = userApp.findUsers({ authedUser, options, query });
+
+            ok(userRepository.find[calledOnce]);
+            equal(users, dbUsers, 'users not returned');
+        });
     });
 
     describe('seed', () => {

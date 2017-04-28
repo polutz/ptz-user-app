@@ -24,7 +24,8 @@ var authedUser = {
     dtCreated: new Date(),
     ip: '192.161.0.1'
 };
-var notCalled = 'notCalled';
+var calledOnce = 'calledOnce',
+    notCalled = 'notCalled';
 describe('UserApp', function () {
     describe('saveUser', function () {
         describe('insert', function () {
@@ -88,7 +89,7 @@ describe('UserApp', function () {
                 }, _callee2, undefined);
             })));
             it('call repository if User is valid', _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
-                var userArgs, calledOnce;
+                var userArgs;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
@@ -102,11 +103,9 @@ describe('UserApp', function () {
                                 return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
 
                             case 3:
-                                calledOnce = 'calledOnce';
-
                                 (0, _ptzAssert.ok)(userRepository.save[calledOnce]);
 
-                            case 5:
+                            case 4:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -142,7 +141,7 @@ describe('UserApp', function () {
         });
         describe('update', function () {
             it('update when new user data is valid', _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var userRepository, dbUser, userApp, userArgs, userSaved, calledOnce;
+                var userRepository, dbUser, userApp, userArgs, userSaved;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
                         switch (_context5.prev = _context5.next) {
@@ -169,12 +168,11 @@ describe('UserApp', function () {
 
                             case 9:
                                 userSaved = _context5.sent;
-                                calledOnce = 'calledOnce';
 
                                 (0, _ptzAssert.ok)(userRepository.save[calledOnce]);
                                 (0, _ptzAssert.equal)(userSaved.displayName, userArgs.displayName);
 
-                            case 13:
+                            case 12:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -557,7 +555,17 @@ describe('UserApp', function () {
         it('delete');
     });
     describe('findUsers', function () {
-        it('find');
+        it('call repository', function () {
+            var userRepository = new _UserRepositoryFake.UserRepositoryFake(null);
+            var dbUsers = [];
+            (0, _sinon.stub)(userRepository, 'find').returns(dbUsers);
+            var userApp = new _index.UserApp({ userRepository: userRepository });
+            var query = {};
+            var options = { limit: 4 };
+            var users = userApp.findUsers({ authedUser: authedUser, options: options, query: query });
+            (0, _ptzAssert.ok)(userRepository.find[calledOnce]);
+            (0, _ptzAssert.equal)(users, dbUsers, 'users not returned');
+        });
     });
     describe('seed', function () {
         it('seed');
