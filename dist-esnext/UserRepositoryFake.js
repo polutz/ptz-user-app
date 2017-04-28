@@ -1,5 +1,5 @@
 import { BaseRepositoryFake } from 'ptz-core-app';
-export default class UserRepositoryFake extends BaseRepositoryFake {
+export class UserRepositoryFake extends BaseRepositoryFake {
     constructor(db) {
         super(db, 'users');
     }

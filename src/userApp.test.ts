@@ -13,7 +13,7 @@ import {
 import { allErrors, ICreatedBy, IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
 import { spy, stub } from 'sinon';
 import { UserApp } from './index';
-import UserRepositoryFake from './UserRepositoryFake';
+import { UserRepositoryFake } from './UserRepositoryFake';
 
 const authedUser: ICreatedBy = {
     dtCreated: new Date(),
@@ -23,62 +23,94 @@ const authedUser: ICreatedBy = {
 const notCalled = 'notCalled';
 
 describe('UserApp', () => {
-    describe('save', () => {
-        var userApp: IUserApp,
-            userRepository: IUserRepository;
+    describe('saveUser', () => {
+        describe('insert', () => {
+            var userApp: IUserApp,
+                userRepository: IUserRepository;
 
-        beforeEach(() => {
-            userRepository = new UserRepositoryFake(null);
+            beforeEach(() => {
+                userRepository = new UserRepositoryFake(null);
 
-            spy(userRepository, 'save');
-            stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
+                spy(userRepository, 'save');
+                stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
 
-            userApp = new UserApp({ userRepository });
+                userApp = new UserApp({ userRepository });
+            });
+
+            it('hash password', async () => {
+                const userArgs: IUserArgs = {
+                    userName: 'angeloocana',
+                    email: 'angeloocana@gmail.com',
+                    displayName: 'Ângelo Ocanã',
+                    password: 'testPassword'
+                };
+
+                const user = await userApp.saveUser({ userArgs, authedUser });
+
+                ok(user.passwordHash, 'passwordHash not set');
+                notOk(user.password, 'password not empty');
+            });
+
+            it('do not call repository if user is invalid', async () => {
+                const userArgs = {
+                    userName: '',
+                    email: '',
+                    displayName: ''
+                };
+                await userApp.saveUser({ userArgs, authedUser });
+                ok(userRepository.save[notCalled]);
+            });
+
+            it('call repository if User is valid', async () => {
+                const userArgs: IUserArgs = {
+                    userName: 'angeloocana',
+                    email: 'angeloocana@gmail.com',
+                    displayName: 'Angelo Ocana'
+                };
+                await userApp.saveUser({ userArgs, authedUser });
+                const calledOnce = 'calledOnce';
+                ok(userRepository.save[calledOnce]);
+            });
+
+            it('set createdBy', async () => {
+                const userArgs: IUserArgs = {
+                    userName: 'angeloocana',
+                    email: 'angeloocana@gmail.com',
+                    displayName: ''
+                };
+                const user = await userApp.saveUser({ userArgs, authedUser });
+                equal(user.createdBy, authedUser);
+            });
         });
 
-        it('hash password', async () => {
-            const userArgs: IUserArgs = {
-                userName: 'angeloocana',
-                email: 'angeloocana@gmail.com',
-                displayName: 'Ângelo Ocanã',
-                password: 'testPassword'
-            };
+        describe('update', () => {
+            it('update when new user data is valid', async () => {
+                const userRepository = new UserRepositoryFake(null);
 
-            const user = await userApp.saveUser({ userArgs, authedUser });
+                spy(userRepository, 'save');
+                stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
 
-            ok(user.passwordHash, 'passwordHash not set');
-            notOk(user.password, 'password not empty');
-        });
+                const dbUser = new User({
+                    userName: 'angeloocana',
+                    email: 'angeloocana@gmail.com',
+                    displayName: 'Angelo Ocana'
+                });
 
-        it('do not call repository if user is invalid', async () => {
-            const userArgs = {
-                userName: '',
-                email: '',
-                displayName: ''
-            };
-            await userApp.saveUser({ userArgs, authedUser });
-            ok(userRepository.save[notCalled]);
-        });
+                stub(userRepository, 'getById').returns(dbUser);
 
-        it('call repository if User is valid', async () => {
-            const userArgs: IUserArgs = {
-                userName: 'angeloocana',
-                email: 'angeloocana@gmail.com',
-                displayName: 'Angelo Ocana'
-            };
-            await userApp.saveUser({ userArgs, authedUser });
-            const calledOnce = 'calledOnce';
-            ok(userRepository.save[calledOnce]);
-        });
+                const userApp = new UserApp({ userRepository });
 
-        it('set createdBy', async () => {
-            const userArgs: IUserArgs = {
-                userName: 'angeloocana',
-                email: 'angeloocana@gmail.com',
-                displayName: ''
-            };
-            const user = await userApp.saveUser({ userArgs, authedUser });
-            equal(user.createdBy, authedUser);
+                const userArgs: IUserArgs = {
+                    userName: 'angeloocana',
+                    email: 'angeloocana@gmail.com',
+                    displayName: 'Angelo Ocana Updated'
+                };
+
+                const userSaved = await userApp.saveUser({ userArgs, authedUser });
+                const calledOnce = 'calledOnce';
+                ok(userRepository.save[calledOnce]);
+                equal(userSaved.displayName, userArgs.displayName);
+            });
         });
     });
 
@@ -302,5 +334,31 @@ describe('UserApp', () => {
 
             equal(userByToken.displayName, user.displayName, 'User Id dont match');
         });
+    });
+
+    describe('updatePassword', () => {
+        it('return error when wrong password');
+        it('return error when invalid password');
+        it('update');
+    });
+
+    describe('updatePasswordToken', () => {
+        it('return error when wrong token');
+        it('return error when invalid password');
+        it('update');
+    });
+
+    describe('deleteUser', () => {
+        it('return error when user not found');
+        it('return error when authuser is not admin or the deleted user');
+        it('delete');
+    });
+
+    describe('findUsers', () => {
+        it('find');
+    });
+
+    describe('seed', () => {
+        it('seed');
     });
 });
