@@ -23,10 +23,11 @@ import {
 
 export default class UserApp extends BaseApp implements IUserApp {
 
-    static actions = {
-        SAVE: 'USER_APP_SAVE',
-        GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
-    };
+    // TODO: Actions
+    // static actions = {
+    //     SAVE: 'USER_APP_SAVE',
+    //     GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
+    // };
 
     tokenSecret = process.env.PASSWORD_SALT;
     passwordSalt = process.env.PASSWORD_SALT;
@@ -38,14 +39,15 @@ export default class UserApp extends BaseApp implements IUserApp {
         this.userRepository = userAppArgs.userRepository;
     }
 
-    async execAction(action) {
-        switch (action.type) {
-            case UserApp.actions.SAVE:
-                return await this.saveUser(action.args);
-            case UserApp.actions.GET_AUTH_TOKEN:
-                return await this.getAuthToken(action.args);
-        }
-    }
+    // TODO: Actions
+    // async execAction(action) {
+    //     switch (action.type) {
+    //         case UserApp.actions.SAVE:
+    //             return await this.saveUser(action.args);
+    //         case UserApp.actions.GET_AUTH_TOKEN:
+    //             return await this.getAuthToken(action.args);
+    //     }
+    // }
 
     async hashPassword(user: IUser): Promise<IUser> {
         if (!user.password)

@@ -5,18 +5,24 @@ import { allErrors, AuthUserForm, User, users } from 'ptz-user-domain';
 export default class UserApp extends BaseApp {
     constructor(userAppArgs) {
         super(userAppArgs);
+        // TODO: Actions
+        // static actions = {
+        //     SAVE: 'USER_APP_SAVE',
+        //     GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
+        // };
         this.tokenSecret = process.env.PASSWORD_SALT;
         this.passwordSalt = process.env.PASSWORD_SALT;
         this.userRepository = userAppArgs.userRepository;
     }
-    async execAction(action) {
-        switch (action.type) {
-            case UserApp.actions.SAVE:
-                return await this.saveUser(action.args);
-            case UserApp.actions.GET_AUTH_TOKEN:
-                return await this.getAuthToken(action.args);
-        }
-    }
+    // TODO: Actions
+    // async execAction(action) {
+    //     switch (action.type) {
+    //         case UserApp.actions.SAVE:
+    //             return await this.saveUser(action.args);
+    //         case UserApp.actions.GET_AUTH_TOKEN:
+    //             return await this.getAuthToken(action.args);
+    //     }
+    // }
     async hashPassword(user) {
         if (!user.password)
             return Promise.resolve(user);
@@ -101,8 +107,4 @@ export default class UserApp extends BaseApp {
         return Promise.resolve(false);
     }
 }
-UserApp.actions = {
-    SAVE: 'USER_APP_SAVE',
-    GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
-};
 //# sourceMappingURL=userApp.js.map

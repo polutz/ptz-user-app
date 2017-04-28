@@ -28,6 +28,11 @@ var UserApp = function (_BaseApp) {
     function UserApp(userAppArgs) {
         _classCallCheck(this, UserApp);
 
+        // TODO: Actions
+        // static actions = {
+        //     SAVE: 'USER_APP_SAVE',
+        //     GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
+        // };
         var _this = _possibleConstructorReturn(this, (UserApp.__proto__ || Object.getPrototypeOf(UserApp)).call(this, userAppArgs));
 
         _this.tokenSecret = process.env.PASSWORD_SALT;
@@ -35,32 +40,49 @@ var UserApp = function (_BaseApp) {
         _this.userRepository = userAppArgs.userRepository;
         return _this;
     }
+    // TODO: Actions
+    // async execAction(action) {
+    //     switch (action.type) {
+    //         case UserApp.actions.SAVE:
+    //             return await this.saveUser(action.args);
+    //         case UserApp.actions.GET_AUTH_TOKEN:
+    //             return await this.getAuthToken(action.args);
+    //     }
+    // }
+
 
     _createClass(UserApp, [{
-        key: 'execAction',
+        key: 'hashPassword',
         value: function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(action) {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(user) {
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                _context.t0 = action.type;
-                                _context.next = _context.t0 === UserApp.actions.SAVE ? 3 : _context.t0 === UserApp.actions.GET_AUTH_TOKEN ? 6 : 9;
-                                break;
+                                if (user.password) {
+                                    _context.next = 2;
+                                    break;
+                                }
 
-                            case 3:
-                                _context.next = 5;
-                                return this.saveUser(action.args);
+                                return _context.abrupt('return', Promise.resolve(user));
 
-                            case 5:
-                                return _context.abrupt('return', _context.sent);
+                            case 2:
+                                if (this.passwordSalt) {
+                                    _context.next = 4;
+                                    break;
+                                }
+
+                                throw new Error('passwordSalt not added to process.env.');
+
+                            case 4:
+                                _context.next = 6;
+                                return (0, _bcryptjs.hash)(user.password, this.passwordSalt);
 
                             case 6:
-                                _context.next = 8;
-                                return this.getAuthToken(action.args);
+                                user.passwordHash = _context.sent;
 
-                            case 8:
-                                return _context.abrupt('return', _context.sent);
+                                user.password = undefined;
+                                return _context.abrupt('return', Promise.resolve(user));
 
                             case 9:
                             case 'end':
@@ -70,55 +92,8 @@ var UserApp = function (_BaseApp) {
                 }, _callee, this);
             }));
 
-            function execAction(_x) {
+            function hashPassword(_x) {
                 return _ref.apply(this, arguments);
-            }
-
-            return execAction;
-        }()
-    }, {
-        key: 'hashPassword',
-        value: function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(user) {
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                if (user.password) {
-                                    _context2.next = 2;
-                                    break;
-                                }
-
-                                return _context2.abrupt('return', Promise.resolve(user));
-
-                            case 2:
-                                if (this.passwordSalt) {
-                                    _context2.next = 4;
-                                    break;
-                                }
-
-                                throw new Error('passwordSalt not added to process.env.');
-
-                            case 4:
-                                _context2.next = 6;
-                                return (0, _bcryptjs.hash)(user.password, this.passwordSalt);
-
-                            case 6:
-                                user.passwordHash = _context2.sent;
-
-                                user.password = undefined;
-                                return _context2.abrupt('return', Promise.resolve(user));
-
-                            case 9:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function hashPassword(_x2) {
-                return _ref2.apply(this, arguments);
             }
 
             return hashPassword;
@@ -126,66 +101,66 @@ var UserApp = function (_BaseApp) {
     }, {
         key: 'saveUser',
         value: function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(args) {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(args) {
                 var user, otherUsers, userDb;
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context2.prev = _context2.next) {
                             case 0:
                                 args.userArgs.createdBy = args.authedUser;
                                 user = new _ptzUserDomain.User(args.userArgs);
-                                _context3.next = 4;
+                                _context2.next = 4;
                                 return this.hashPassword(user);
 
                             case 4:
-                                user = _context3.sent;
+                                user = _context2.sent;
 
                                 if (user.isValid()) {
-                                    _context3.next = 7;
+                                    _context2.next = 7;
                                     break;
                                 }
 
-                                return _context3.abrupt('return', Promise.resolve(user));
+                                return _context2.abrupt('return', Promise.resolve(user));
 
                             case 7:
-                                _context3.next = 9;
+                                _context2.next = 9;
                                 return this.userRepository.getOtherUsersWithSameUserNameOrEmail(user);
 
                             case 9:
-                                otherUsers = _context3.sent;
+                                otherUsers = _context2.sent;
 
                                 if (!user.otherUsersWithSameUserNameOrEmail(otherUsers)) {
-                                    _context3.next = 12;
+                                    _context2.next = 12;
                                     break;
                                 }
 
-                                return _context3.abrupt('return', Promise.resolve(user));
+                                return _context2.abrupt('return', Promise.resolve(user));
 
                             case 12:
-                                _context3.next = 14;
+                                _context2.next = 14;
                                 return this.userRepository.getById(user.id);
 
                             case 14:
-                                userDb = _context3.sent;
+                                userDb = _context2.sent;
 
                                 if (userDb) user = userDb.update(user);
-                                _context3.next = 18;
+                                _context2.next = 18;
                                 return this.userRepository.save(user);
 
                             case 18:
-                                user = _context3.sent;
-                                return _context3.abrupt('return', Promise.resolve(user));
+                                user = _context2.sent;
+                                return _context2.abrupt('return', Promise.resolve(user));
 
                             case 20:
                             case 'end':
-                                return _context3.stop();
+                                return _context2.stop();
                         }
                     }
-                }, _callee3, this);
+                }, _callee2, this);
             }));
 
-            function saveUser(_x3) {
-                return _ref3.apply(this, arguments);
+            function saveUser(_x2) {
+                return _ref2.apply(this, arguments);
             }
 
             return saveUser;
@@ -198,33 +173,85 @@ var UserApp = function (_BaseApp) {
     }, {
         key: 'authUser',
         value: function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(args) {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(args) {
                 var form, user, isPasswordCorrect;
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                        switch (_context3.prev = _context3.next) {
+                            case 0:
+                                form = args.form;
+                                _context3.next = 3;
+                                return this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
+
+                            case 3:
+                                user = _context3.sent;
+
+                                if (user) {
+                                    _context3.next = 6;
+                                    break;
+                                }
+
+                                return _context3.abrupt('return', Promise.resolve(null));
+
+                            case 6:
+                                _context3.next = 8;
+                                return (0, _bcryptjs.compare)(form.password, user.passwordHash);
+
+                            case 8:
+                                isPasswordCorrect = _context3.sent;
+                                return _context3.abrupt('return', Promise.resolve(isPasswordCorrect ? user : null));
+
+                            case 10:
+                            case 'end':
+                                return _context3.stop();
+                        }
+                    }
+                }, _callee3, this);
+            }));
+
+            function authUser(_x3) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return authUser;
+        }()
+    }, {
+        key: 'getAuthToken',
+        value: function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(args) {
+                var form, authToken, user, errors;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
-                                form = args.form;
-                                _context4.next = 3;
-                                return this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
+                                form = new _ptzUserDomain.AuthUserForm(args.form);
+                                authToken = null;
 
-                            case 3:
-                                user = _context4.sent;
-
-                                if (user) {
-                                    _context4.next = 6;
+                                if (form.isValid()) {
+                                    _context4.next = 4;
                                     break;
                                 }
 
-                                return _context4.abrupt('return', Promise.resolve(null));
+                                return _context4.abrupt('return', Promise.resolve({
+                                    authToken: authToken,
+                                    user: null,
+                                    errors: form.errors
+                                }));
+
+                            case 4:
+                                _context4.next = 6;
+                                return this.authUser(args);
 
                             case 6:
-                                _context4.next = 8;
-                                return (0, _bcryptjs.compare)(form.password, user.passwordHash);
+                                user = _context4.sent;
+                                errors = [];
 
-                            case 8:
-                                isPasswordCorrect = _context4.sent;
-                                return _context4.abrupt('return', Promise.resolve(isPasswordCorrect ? user : null));
+                                if (user == null) errors.push(_ptzUserDomain.allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);else authToken = (0, _jwtSimple.encode)(user, this.tokenSecret);
+                                return _context4.abrupt('return', Promise.resolve({
+                                    authToken: authToken,
+                                    user: user,
+                                    errors: errors
+                                }));
 
                             case 10:
                             case 'end':
@@ -234,60 +261,8 @@ var UserApp = function (_BaseApp) {
                 }, _callee4, this);
             }));
 
-            function authUser(_x4) {
+            function getAuthToken(_x4) {
                 return _ref4.apply(this, arguments);
-            }
-
-            return authUser;
-        }()
-    }, {
-        key: 'getAuthToken',
-        value: function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(args) {
-                var form, authToken, user, errors;
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                    while (1) {
-                        switch (_context5.prev = _context5.next) {
-                            case 0:
-                                form = new _ptzUserDomain.AuthUserForm(args.form);
-                                authToken = null;
-
-                                if (form.isValid()) {
-                                    _context5.next = 4;
-                                    break;
-                                }
-
-                                return _context5.abrupt('return', Promise.resolve({
-                                    authToken: authToken,
-                                    user: null,
-                                    errors: form.errors
-                                }));
-
-                            case 4:
-                                _context5.next = 6;
-                                return this.authUser(args);
-
-                            case 6:
-                                user = _context5.sent;
-                                errors = [];
-
-                                if (user == null) errors.push(_ptzUserDomain.allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);else authToken = (0, _jwtSimple.encode)(user, this.tokenSecret);
-                                return _context5.abrupt('return', Promise.resolve({
-                                    authToken: authToken,
-                                    user: user,
-                                    errors: errors
-                                }));
-
-                            case 10:
-                            case 'end':
-                                return _context5.stop();
-                        }
-                    }
-                }, _callee5, this);
-            }));
-
-            function getAuthToken(_x5) {
-                return _ref5.apply(this, arguments);
             }
 
             return getAuthToken;
@@ -301,13 +276,13 @@ var UserApp = function (_BaseApp) {
     }, {
         key: 'seed',
         value: function () {
-            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
                 var _this2 = this;
 
                 var authedUser;
-                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
-                        switch (_context7.prev = _context7.next) {
+                        switch (_context6.prev = _context6.next) {
                             case 0:
                                 this.log('seeding users', _ptzUserDomain.users.allUsers);
                                 authedUser = {
@@ -322,31 +297,55 @@ var UserApp = function (_BaseApp) {
                                 };
 
                                 _ptzUserDomain.users.allUsers.forEach(function () {
-                                    var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(user) {
-                                        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                                    var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(user) {
+                                        return regeneratorRuntime.wrap(function _callee5$(_context5) {
                                             while (1) {
-                                                switch (_context6.prev = _context6.next) {
+                                                switch (_context5.prev = _context5.next) {
                                                     case 0:
-                                                        _context6.next = 2;
+                                                        _context5.next = 2;
                                                         return _this2.saveUser({ userArgs: user, authedUser: authedUser });
 
                                                     case 2:
-                                                        return _context6.abrupt('return', _context6.sent);
+                                                        return _context5.abrupt('return', _context5.sent);
 
                                                     case 3:
                                                     case 'end':
-                                                        return _context6.stop();
+                                                        return _context5.stop();
                                                 }
                                             }
-                                        }, _callee6, _this2);
+                                        }, _callee5, _this2);
                                     }));
 
-                                    return function (_x6) {
-                                        return _ref7.apply(this, arguments);
+                                    return function (_x5) {
+                                        return _ref6.apply(this, arguments);
                                     };
                                 }());
 
                             case 3:
+                            case 'end':
+                                return _context6.stop();
+                        }
+                    }
+                }, _callee6, this);
+            }));
+
+            function seed() {
+                return _ref5.apply(this, arguments);
+            }
+
+            return seed;
+        }()
+    }, {
+        key: 'updatePassword',
+        value: function () {
+            var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(args) {
+                return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                return _context7.abrupt('return', Promise.resolve(false));
+
+                            case 1:
                             case 'end':
                                 return _context7.stop();
                         }
@@ -354,14 +353,14 @@ var UserApp = function (_BaseApp) {
                 }, _callee7, this);
             }));
 
-            function seed() {
-                return _ref6.apply(this, arguments);
+            function updatePassword(_x6) {
+                return _ref7.apply(this, arguments);
             }
 
-            return seed;
+            return updatePassword;
         }()
     }, {
-        key: 'updatePassword',
+        key: 'updatePasswordToken',
         value: function () {
             var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(args) {
                 return regeneratorRuntime.wrap(function _callee8$(_context8) {
@@ -378,14 +377,14 @@ var UserApp = function (_BaseApp) {
                 }, _callee8, this);
             }));
 
-            function updatePassword(_x7) {
+            function updatePasswordToken(_x7) {
                 return _ref8.apply(this, arguments);
             }
 
-            return updatePassword;
+            return updatePasswordToken;
         }()
     }, {
-        key: 'updatePasswordToken',
+        key: 'deleteUser',
         value: function () {
             var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(args) {
                 return regeneratorRuntime.wrap(function _callee9$(_context9) {
@@ -402,32 +401,8 @@ var UserApp = function (_BaseApp) {
                 }, _callee9, this);
             }));
 
-            function updatePasswordToken(_x8) {
+            function deleteUser(_x8) {
                 return _ref9.apply(this, arguments);
-            }
-
-            return updatePasswordToken;
-        }()
-    }, {
-        key: 'deleteUser',
-        value: function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(args) {
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
-                    while (1) {
-                        switch (_context10.prev = _context10.next) {
-                            case 0:
-                                return _context10.abrupt('return', Promise.resolve(false));
-
-                            case 1:
-                            case 'end':
-                                return _context10.stop();
-                        }
-                    }
-                }, _callee10, this);
-            }));
-
-            function deleteUser(_x9) {
-                return _ref10.apply(this, arguments);
             }
 
             return deleteUser;
@@ -436,12 +411,8 @@ var UserApp = function (_BaseApp) {
 
     return UserApp;
 }(_ptzCoreApp.BaseApp);
+//# sourceMappingURL=userApp.js.map
+
 
 exports.default = UserApp;
-
-UserApp.actions = {
-    SAVE: 'USER_APP_SAVE',
-    GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
-};
-//# sourceMappingURL=userApp.js.map
 //# sourceMappingURL=userApp.js.map
