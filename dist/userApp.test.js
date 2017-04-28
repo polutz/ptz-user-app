@@ -568,7 +568,8 @@ describe('UserApp', function () {
         });
     });
     describe('seed', function () {
-        it('seed');
+        it('default users');
+        it('custom users');
     });
 });
 //# sourceMappingURL=userApp.test.js.map

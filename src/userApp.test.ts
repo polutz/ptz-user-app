@@ -374,6 +374,7 @@ describe('UserApp', () => {
     });
 
     describe('seed', () => {
-        it('seed');
+        it('default users');
+        it('custom users');
     });
 });

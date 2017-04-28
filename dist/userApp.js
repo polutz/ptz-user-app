@@ -279,12 +279,13 @@ var UserApp = function (_BaseApp) {
             var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
                 var _this2 = this;
 
+                var users = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _ptzUserDomain.users.allUsers;
                 var authedUser;
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
-                                this.log('seeding users', _ptzUserDomain.users.allUsers);
+                                this.log('seeding users', users);
                                 authedUser = {
                                     ip: '',
                                     dtCreated: new Date(),
@@ -296,7 +297,7 @@ var UserApp = function (_BaseApp) {
                                     }
                                 };
 
-                                _ptzUserDomain.users.allUsers.forEach(function () {
+                                users.forEach(function () {
                                     var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(user) {
                                         return regeneratorRuntime.wrap(function _callee5$(_context5) {
                                             while (1) {
@@ -316,12 +317,13 @@ var UserApp = function (_BaseApp) {
                                         }, _callee5, _this2);
                                     }));
 
-                                    return function (_x5) {
+                                    return function (_x6) {
                                         return _ref6.apply(this, arguments);
                                     };
                                 }());
+                                return _context6.abrupt('return', Promise.resolve());
 
-                            case 3:
+                            case 4:
                             case 'end':
                                 return _context6.stop();
                         }
@@ -353,7 +355,7 @@ var UserApp = function (_BaseApp) {
                 }, _callee7, this);
             }));
 
-            function updatePassword(_x6) {
+            function updatePassword(_x7) {
                 return _ref7.apply(this, arguments);
             }
 
@@ -377,7 +379,7 @@ var UserApp = function (_BaseApp) {
                 }, _callee8, this);
             }));
 
-            function updatePasswordToken(_x7) {
+            function updatePasswordToken(_x8) {
                 return _ref8.apply(this, arguments);
             }
 
@@ -401,7 +403,7 @@ var UserApp = function (_BaseApp) {
                 }, _callee9, this);
             }));
 
-            function deleteUser(_x8) {
+            function deleteUser(_x9) {
                 return _ref9.apply(this, arguments);
             }
 

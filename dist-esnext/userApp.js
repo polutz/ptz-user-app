@@ -1,7 +1,7 @@
 import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
 import { BaseApp } from 'ptz-core-app';
-import { allErrors, AuthUserForm, User, users } from 'ptz-user-domain';
+import { allErrors, AuthUserForm, User, users as usersToSeed } from 'ptz-user-domain';
 export default class UserApp extends BaseApp {
     constructor(userAppArgs) {
         super(userAppArgs);
@@ -83,8 +83,8 @@ export default class UserApp extends BaseApp {
         const user = decode(args.token, this.passwordSalt);
         return Promise.resolve(user);
     }
-    async seed() {
-        this.log('seeding users', users.allUsers);
+    async seed(users = usersToSeed.allUsers) {
+        this.log('seeding users', users);
         const authedUser = {
             ip: '',
             dtCreated: new Date(),
@@ -95,7 +95,8 @@ export default class UserApp extends BaseApp {
                 userName: ''
             }
         };
-        users.allUsers.forEach(async (user) => await this.saveUser({ userArgs: user, authedUser }));
+        users.forEach(async (user) => await this.saveUser({ userArgs: user, authedUser }));
+        return Promise.resolve();
     }
     async updatePassword(args) {
         return Promise.resolve(false);

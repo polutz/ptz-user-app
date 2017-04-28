@@ -18,7 +18,7 @@ import {
     IUserRepository,
     IVerifyAuthTokenArgs,
     User,
-    users
+    users as usersToSeed
 } from 'ptz-user-domain';
 
 export default class UserApp extends BaseApp implements IUserApp {
@@ -133,8 +133,8 @@ export default class UserApp extends BaseApp implements IUserApp {
         return Promise.resolve(user);
     }
 
-    async seed(): Promise<void> {
-        this.log('seeding users', users.allUsers);
+    async seed(users = usersToSeed.allUsers): Promise<void> {
+        this.log('seeding users', users);
         const authedUser: ICreatedBy = {
             ip: '',
             dtCreated: new Date(),
@@ -146,7 +146,8 @@ export default class UserApp extends BaseApp implements IUserApp {
             }
         };
 
-        users.allUsers.forEach(async user => await this.saveUser({ userArgs: user, authedUser }));
+        users.forEach(async user => await this.saveUser({ userArgs: user, authedUser }));
+        return Promise.resolve();
     }
 
     async updatePassword(args: IUpdatePasswordArgs): Promise<boolean> {
