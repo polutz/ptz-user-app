@@ -11,7 +11,8 @@
     "promptValues": {
       "appname": "ptz-user-app",
       "githubAuthor": "polutz",
-      "runNpmInstall": false
+      "runNpmInstall": false,
+      "codecovToken": "b1c7616b-9a84-436e-9329-50273c9d72db"
     }
   }
 }

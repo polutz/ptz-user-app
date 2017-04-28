@@ -1,11 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import dotenv from 'dotenv';
 dotenv.config();
 import { contains, emptyArray, equal, notEmptyArray, notOk, ok } from 'ptz-assert';
@@ -27,45 +19,45 @@ describe('UserApp', () => {
             stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
             userApp = new UserApp({ userRepository });
         });
-        it('hash password', () => __awaiter(this, void 0, void 0, function* () {
+        it('hash password', async () => {
             const userArgs = {
                 userName: 'angeloocana',
                 email: 'angeloocana@gmail.com',
                 displayName: 'Ângelo Ocanã',
                 password: 'testPassword'
             };
-            const user = yield userApp.saveUser({ userArgs, authedUser });
+            const user = await userApp.saveUser({ userArgs, authedUser });
             ok(user.passwordHash, 'passwordHash not set');
             notOk(user.password, 'password not empty');
-        }));
-        it('do not call repository if user is invalid', () => __awaiter(this, void 0, void 0, function* () {
+        });
+        it('do not call repository if user is invalid', async () => {
             const userArgs = {
                 userName: '',
                 email: '',
                 displayName: ''
             };
-            yield userApp.saveUser({ userArgs, authedUser });
+            await userApp.saveUser({ userArgs, authedUser });
             ok(userRepository.save[notCalled]);
-        }));
-        it('call repository if User is valid', () => __awaiter(this, void 0, void 0, function* () {
+        });
+        it('call repository if User is valid', async () => {
             const userArgs = {
                 userName: 'angeloocana',
                 email: 'angeloocana@gmail.com',
                 displayName: 'Angelo Ocana'
             };
-            yield userApp.saveUser({ userArgs, authedUser });
+            await userApp.saveUser({ userArgs, authedUser });
             const calledOnce = 'calledOnce';
             ok(userRepository.save[calledOnce]);
-        }));
-        it('set createdBy', () => __awaiter(this, void 0, void 0, function* () {
+        });
+        it('set createdBy', async () => {
             const userArgs = {
                 userName: 'angeloocana',
                 email: 'angeloocana@gmail.com',
                 displayName: ''
             };
-            const user = yield userApp.saveUser({ userArgs, authedUser });
+            const user = await userApp.saveUser({ userArgs, authedUser });
             equal(user.createdBy, authedUser);
-        }));
+        });
     });
     describe('authUser', () => {
         var userApp, userRepository;
@@ -73,16 +65,16 @@ describe('UserApp', () => {
             userRepository = new UserRepositoryFake(null);
             userApp = new UserApp({ userRepository });
         });
-        it('return null when User not found', () => __awaiter(this, void 0, void 0, function* () {
+        it('return null when User not found', async () => {
             const userNameOrEmail = 'angeloocana', password = 'teste';
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
-            const user = yield userApp.authUser({
+            const user = await userApp.authUser({
                 form: { userNameOrEmail, password },
                 authedUser
             });
             notOk(user);
-        }));
-        it('return null when User found but incorrect password', () => __awaiter(this, void 0, void 0, function* () {
+        });
+        it('return null when User found but incorrect password', async () => {
             const password = 'testeteste';
             var user = new User({
                 userName: 'angeloocana',
@@ -90,9 +82,9 @@ describe('UserApp', () => {
                 displayName: '',
                 password
             });
-            user = yield userApp.hashPassword(user);
+            user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
-            user = yield userApp.authUser({
+            user = await userApp.authUser({
                 form: {
                     userNameOrEmail: user.userName,
                     password: 'incorrectPassword'
@@ -100,8 +92,8 @@ describe('UserApp', () => {
                 authedUser
             });
             notOk(user);
-        }));
-        it('return user when correct password', () => __awaiter(this, void 0, void 0, function* () {
+        });
+        it('return user when correct password', async () => {
             const password = 'testeteste';
             var user = new User({
                 userName: 'angeloocana',
@@ -109,9 +101,9 @@ describe('UserApp', () => {
                 displayName: 'Angelo Ocana',
                 password
             });
-            user = yield userApp.hashPassword(user);
+            user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
-            user = yield userApp.authUser({
+            user = await userApp.authUser({
                 form: {
                     userNameOrEmail: user.userName,
                     password
@@ -120,14 +112,14 @@ describe('UserApp', () => {
             });
             ok(user);
             emptyArray(user.errors);
-        }));
+        });
     });
     describe('getAuthToken', () => {
-        it('add errors when invalid userName or Email', () => __awaiter(this, void 0, void 0, function* () {
+        it('add errors when invalid userName or Email', async () => {
             const userRepository = new UserRepositoryFake(null);
             const userApp = new UserApp({ userRepository });
             spy(userRepository, 'getByUserNameOrEmail');
-            const authToken = yield userApp.getAuthToken({
+            const authToken = await userApp.getAuthToken({
                 form: {
                     userNameOrEmail: 'ln',
                     password: 'testtest'
@@ -138,12 +130,12 @@ describe('UserApp', () => {
             notOk(authToken.authToken, 'Do NOT Generate token');
             notOk(authToken.user, 'DO NOT return user');
             notEmptyArray(authToken.errors, 'return errors');
-        }));
-        it('add error when invalid password', () => __awaiter(this, void 0, void 0, function* () {
+        });
+        it('add error when invalid password', async () => {
             const userRepository = new UserRepositoryFake(null);
             const userApp = new UserApp({ userRepository });
             spy(userRepository, 'getByUserNameOrEmail');
-            const authToken = yield userApp.getAuthToken({
+            const authToken = await userApp.getAuthToken({
                 form: {
                     userNameOrEmail: 'angeloocana',
                     password: 't'
@@ -154,8 +146,8 @@ describe('UserApp', () => {
             notOk(authToken.authToken, 'Do NOT Generate token');
             notOk(authToken.user, 'DO NOT return user');
             notEmptyArray(authToken.errors, 'return errors');
-        }));
-        it('generate token when correct password', () => __awaiter(this, void 0, void 0, function* () {
+        });
+        it('generate token when correct password', async () => {
             const userRepository = new UserRepositoryFake(null);
             const userApp = new UserApp({ userRepository });
             var user = new User({
@@ -163,9 +155,9 @@ describe('UserApp', () => {
                 email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
                 password: '123456'
             });
-            user = yield userApp.hashPassword(user);
+            user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
-            const authToken = yield userApp.getAuthToken({
+            const authToken = await userApp.getAuthToken({
                 form: {
                     userNameOrEmail: 'lnsilva',
                     password: '123456'
@@ -176,12 +168,12 @@ describe('UserApp', () => {
             ok(authToken.user, 'no user');
             ok(authToken.user.id, 'no user id');
             emptyArray(authToken.errors, 'return errors');
-        }));
-        it('add errors when incorrect password', () => __awaiter(this, void 0, void 0, function* () {
+        });
+        it('add errors when incorrect password', async () => {
             const userRepository = new UserRepositoryFake(null);
             const userApp = new UserApp({ userRepository });
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
-            const authToken = yield userApp.getAuthToken({
+            const authToken = await userApp.getAuthToken({
                 form: {
                     userNameOrEmail: 'lnsilva',
                     password: '123456'
@@ -191,7 +183,7 @@ describe('UserApp', () => {
             notOk(authToken.authToken, 'do not generate token');
             notOk(authToken.user, 'do not return user');
             contains(authToken.errors, allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD, 'return invalid userName, email or password error');
-        }));
+        });
     });
     describe('verifyAuthToken', () => {
         var userApp, userRepository;
@@ -199,10 +191,10 @@ describe('UserApp', () => {
             userRepository = new UserRepositoryFake(null);
             userApp = new UserApp({ userRepository });
         });
-        it('Invalid token throws exception', () => __awaiter(this, void 0, void 0, function* () {
+        it('Invalid token throws exception', async () => {
             var hasError = false;
             try {
-                yield userApp.verifyAuthToken({
+                await userApp.verifyAuthToken({
                     token: 'Invalid_Token',
                     authedUser
                 });
@@ -211,17 +203,17 @@ describe('UserApp', () => {
                 hasError = true;
             }
             ok(hasError);
-        }));
-        it('Valid token return user', () => __awaiter(this, void 0, void 0, function* () {
+        });
+        it('Valid token return user', async () => {
             var user = new User({
                 userName: 'lnsilva',
                 email: 'lucas.neris@globalpoints.com.br',
                 displayName: 'Lucas Neris',
                 password: '123456'
             });
-            user = yield userApp.hashPassword(user);
+            user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
-            const authToken = yield userApp.getAuthToken({
+            const authToken = await userApp.getAuthToken({
                 form: {
                     userNameOrEmail: 'lnsilva',
                     password: '123456'
@@ -229,7 +221,7 @@ describe('UserApp', () => {
                 authedUser
             });
             ok(authToken.authToken, 'Empty Token');
-            const userByToken = yield userApp.verifyAuthToken({
+            const userByToken = await userApp.verifyAuthToken({
                 token: authToken.authToken,
                 authedUser
             });
@@ -237,7 +229,7 @@ describe('UserApp', () => {
             equal(userByToken.email, user.email, 'User Id dont match');
             equal(userByToken.userName, user.userName, 'User Id dont match');
             equal(userByToken.displayName, user.displayName, 'User Id dont match');
-        }));
+        });
     });
 });
 //# sourceMappingURL=userApp.test.js.map

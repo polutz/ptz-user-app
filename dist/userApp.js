@@ -14,36 +14,13 @@ var _ptzCoreApp = require('ptz-core-app');
 
 var _ptzUserDomain = require('ptz-user-domain');
 
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) {
-            try {
-                step(generator.next(value));
-            } catch (e) {
-                reject(e);
-            }
-        }
-        function rejected(value) {
-            try {
-                step(generator["throw"](value));
-            } catch (e) {
-                reject(e);
-            }
-        }
-        function step(result) {
-            result.done ? resolve(result.value) : new P(function (resolve) {
-                resolve(result.value);
-            }).then(fulfilled, rejected);
-        }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
 var UserApp = function (_BaseApp) {
     _inherits(UserApp, _BaseApp);
@@ -61,8 +38,8 @@ var UserApp = function (_BaseApp) {
 
     _createClass(UserApp, [{
         key: 'execAction',
-        value: function execAction(action) {
-            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee() {
+        value: function () {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(action) {
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
@@ -92,11 +69,17 @@ var UserApp = function (_BaseApp) {
                     }
                 }, _callee, this);
             }));
-        }
+
+            function execAction(_x) {
+                return _ref.apply(this, arguments);
+            }
+
+            return execAction;
+        }()
     }, {
         key: 'hashPassword',
-        value: function hashPassword(user) {
-            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
+        value: function () {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(user) {
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
@@ -133,11 +116,17 @@ var UserApp = function (_BaseApp) {
                     }
                 }, _callee2, this);
             }));
-        }
+
+            function hashPassword(_x2) {
+                return _ref2.apply(this, arguments);
+            }
+
+            return hashPassword;
+        }()
     }, {
         key: 'saveUser',
-        value: function saveUser(args) {
-            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee3() {
+        value: function () {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(args) {
                 var user, otherUsers, userDb;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
@@ -194,7 +183,13 @@ var UserApp = function (_BaseApp) {
                     }
                 }, _callee3, this);
             }));
-        }
+
+            function saveUser(_x3) {
+                return _ref3.apply(this, arguments);
+            }
+
+            return saveUser;
+        }()
     }, {
         key: 'findUsers',
         value: function findUsers(args) {
@@ -202,8 +197,8 @@ var UserApp = function (_BaseApp) {
         }
     }, {
         key: 'authUser',
-        value: function authUser(args) {
-            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee4() {
+        value: function () {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(args) {
                 var form, user, isPasswordCorrect;
                 return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
@@ -238,11 +233,17 @@ var UserApp = function (_BaseApp) {
                     }
                 }, _callee4, this);
             }));
-        }
+
+            function authUser(_x4) {
+                return _ref4.apply(this, arguments);
+            }
+
+            return authUser;
+        }()
     }, {
         key: 'getAuthToken',
-        value: function getAuthToken(args) {
-            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee5() {
+        value: function () {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(args) {
                 var form, authToken, user, errors;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
@@ -284,7 +285,13 @@ var UserApp = function (_BaseApp) {
                     }
                 }, _callee5, this);
             }));
-        }
+
+            function getAuthToken(_x5) {
+                return _ref5.apply(this, arguments);
+            }
+
+            return getAuthToken;
+        }()
     }, {
         key: 'verifyAuthToken',
         value: function verifyAuthToken(args) {
@@ -293,8 +300,8 @@ var UserApp = function (_BaseApp) {
         }
     }, {
         key: 'seed',
-        value: function seed() {
-            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee7() {
+        value: function () {
+            var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
                 var _this2 = this;
 
                 var authedUser;
@@ -314,14 +321,14 @@ var UserApp = function (_BaseApp) {
                                     }
                                 };
 
-                                _ptzUserDomain.users.allUsers.forEach(function (user) {
-                                    return __awaiter(_this2, void 0, void 0, regeneratorRuntime.mark(function _callee6() {
+                                _ptzUserDomain.users.allUsers.forEach(function () {
+                                    var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(user) {
                                         return regeneratorRuntime.wrap(function _callee6$(_context6) {
                                             while (1) {
                                                 switch (_context6.prev = _context6.next) {
                                                     case 0:
                                                         _context6.next = 2;
-                                                        return this.saveUser({ userArgs: user, authedUser: authedUser });
+                                                        return _this2.saveUser({ userArgs: user, authedUser: authedUser });
 
                                                     case 2:
                                                         return _context6.abrupt('return', _context6.sent);
@@ -331,9 +338,13 @@ var UserApp = function (_BaseApp) {
                                                         return _context6.stop();
                                                 }
                                             }
-                                        }, _callee6, this);
+                                        }, _callee6, _this2);
                                     }));
-                                });
+
+                                    return function (_x6) {
+                                        return _ref7.apply(this, arguments);
+                                    };
+                                }());
 
                             case 3:
                             case 'end':
@@ -342,11 +353,17 @@ var UserApp = function (_BaseApp) {
                     }
                 }, _callee7, this);
             }));
-        }
+
+            function seed() {
+                return _ref6.apply(this, arguments);
+            }
+
+            return seed;
+        }()
     }, {
         key: 'updatePassword',
-        value: function updatePassword(args) {
-            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee8() {
+        value: function () {
+            var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(args) {
                 return regeneratorRuntime.wrap(function _callee8$(_context8) {
                     while (1) {
                         switch (_context8.prev = _context8.next) {
@@ -360,11 +377,17 @@ var UserApp = function (_BaseApp) {
                     }
                 }, _callee8, this);
             }));
-        }
+
+            function updatePassword(_x7) {
+                return _ref8.apply(this, arguments);
+            }
+
+            return updatePassword;
+        }()
     }, {
         key: 'updatePasswordToken',
-        value: function updatePasswordToken(args) {
-            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee9() {
+        value: function () {
+            var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(args) {
                 return regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
                         switch (_context9.prev = _context9.next) {
@@ -378,11 +401,17 @@ var UserApp = function (_BaseApp) {
                     }
                 }, _callee9, this);
             }));
-        }
+
+            function updatePasswordToken(_x8) {
+                return _ref9.apply(this, arguments);
+            }
+
+            return updatePasswordToken;
+        }()
     }, {
         key: 'deleteUser',
-        value: function deleteUser(args) {
-            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee10() {
+        value: function () {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(args) {
                 return regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
                         switch (_context10.prev = _context10.next) {
@@ -396,7 +425,13 @@ var UserApp = function (_BaseApp) {
                     }
                 }, _callee10, this);
             }));
-        }
+
+            function deleteUser(_x9) {
+                return _ref10.apply(this, arguments);
+            }
+
+            return deleteUser;
+        }()
     }]);
 
     return UserApp;
