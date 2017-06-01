@@ -1,5 +1,5 @@
 TN:
-SF:/projects/polutz/ptz-user-app/dist-esnext/UserRepositoryFake.js
+SF:/home/angeloocana/dev/polutz/ptz-user-app/dist-esnext/UserRepositoryFake.js
 FN:3,UserRepositoryFake
 FNF:1
 FNH:1
@@ -16,7 +16,7 @@ BRF:2
 BRH:1
 end_of_record
 TN:
-SF:/projects/polutz/ptz-user-app/dist-esnext/allActions.js
+SF:/home/angeloocana/dev/polutz/ptz-user-app/dist-esnext/allActions.js
 FNF:0
 FNH:0
 DA:1,1
@@ -26,7 +26,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/projects/polutz/ptz-user-app/dist-esnext/index.js
+SF:/home/angeloocana/dev/polutz/ptz-user-app/dist-esnext/index.js
 FNF:0
 FNH:0
 DA:1,1
@@ -36,7 +36,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/projects/polutz/ptz-user-app/dist-esnext/userApp.js
+SF:/home/angeloocana/dev/polutz/ptz-user-app/dist-esnext/userApp.js
 FN:6,UserApp
 FN:98,(anonymous_35)
 FN:98,_callee5

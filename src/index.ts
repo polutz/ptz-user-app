@@ -1,5 +1,5 @@
 import UserApp from './userApp';
 
-export{
+export {
     UserApp
 };
