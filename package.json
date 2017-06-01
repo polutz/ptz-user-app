@@ -7,14 +7,15 @@
   "scripts": {
     "lint": "tslint ./src/**/*.ts ./src/**/*.test.ts ./src/**/*.d.ts",
     "js": "rimraf dist-esnext && tsc && rimraf dist && babel dist-esnext -d dist --presets es2015 --source-maps",
-    "pretest": "npm-run-all --parallel js lint",
+    "pretest": "npm-run-all --parallel js lint gensalt",
     "mocha": "mocha ./dist/**/*.js --require babel-polyfill",
     "test": "nyc npm run mocha && nyc report --reporter=html --reporter=text-lcov > coverage.lcov && f() { EXIT=0; codecov --token=b1c7616b-9a84-436e-9329-50273c9d72db || exit $EXIT; }; f",
     "test:cover": "npm run test && opn ./coverage/index.html",
     "predebug": "npm run pretest",
     "debug": "node --nolazy --debug-brk=5858 dist/index.js",
     "docs:build": "typedoc --out ./docs ./ --includeDeclarations --excludeExternals --exclude '**/*.test.ts'",
-    "docs": "npm run docs:build && opn ./docs/index.html"
+    "docs": "npm run docs:build && opn ./docs/index.html",
+    "gensalt": "node gensalt.js"
   },
   "repository": {
     "type": "git",
