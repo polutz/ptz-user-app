@@ -1,6 +1,10 @@
 ## master
 
 
+## 1.5.3 (June 1, 2017)
+
+* Update ptz-user-domain.
+
 ## 1.5.2 (April 19, 2017)
 
 * Do not call database in order to find a user when authenticateUserForm is

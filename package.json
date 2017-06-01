@@ -1,6 +1,6 @@
 {
   "name": "ptz-user-app",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Polutz User App.",
   "main": "dist/index.js",
   "typings": "src/index.js",
@@ -53,15 +53,5 @@
     "jwt-simple": "^0.5.1",
     "ptz-core-app": "^1.0.0",
     "ptz-user-domain": "^1.8.0"
-  },
-  "scriptsBK": {
-    "lint": "tslint ./src/**/*.ts ./src/**/*.test.ts ./src/**/*.d.ts",
-    "js": "rimraf dist-esnext && tsc && rimraf dist && babel dist-esnext -d dist --presets es2015 --source-maps",
-    "pretest": "npm-run-all --parallel js lint",
-    "mocha": "mocha ./dist/**/*.js --require babel-polyfill",
-    "test": "nyc npm run mocha && nyc report --reporter=html --reporter=text-lcov > coverage.lcov && f() { EXIT=0; codecov --token=b1c7616b-9a84-436e-9329-50273c9d72db || exit $EXIT; }; f",
-    "test:cover": "npm run test && opn ./coverage/lcov-report/index.html",
-    "predebug": "npm run pretest",
-    "debug": "node --nolazy --debug-brk=5858 dist/index.js"
   }
 }
