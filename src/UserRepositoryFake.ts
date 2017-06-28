@@ -1,17 +1,27 @@
-import { BaseRepositoryFake } from 'ptz-core-app';
-import { IUser, IUserRepository } from 'ptz-user-domain';
+// import {  } from '@alanmarcell/ptz-core-app';
+import { IUser } from '@alanmarcell/ptz-user-domain';
 
-export class UserRepositoryFake extends BaseRepositoryFake implements IUserRepository {
+const entities = [];
 
-    constructor(db) {
-        super(db, 'users');
-    }
+export const getOtherUsersWithSameUserNameOrEmail = (user: IUser) => {
+    return entities;
+};
 
-    getOtherUsersWithSameUserNameOrEmail(user: IUser): Promise<IUser[]> {
-        return Promise.resolve(this.entities);
-    }
+export const getByUserNameOrEmail = (userNameOrEmail: string) => {
+    return entities[0];
+};
 
-    getByUserNameOrEmail(userNameOrEmail: string): Promise<IUser> {
-        return Promise.resolve(this.entities[0]);
-    }
-}
+// export class UserRepositoryFake extends BaseRepositoryFake implements IUserRepository {
+
+//     constructor(db) {
+//         super(db, 'users');
+//     }
+
+//     getOtherUsersWithSameUserNameOrEmail(user: IUser): Promise<IUser[]> {
+//         return Promise.resolve(this.entities);
+//     }
+
+//     getByUserNameOrEmail(userNameOrEmail: string): Promise<IUser> {
+//         return Promise.resolve(this.entities[0]);
+//     }
+// }

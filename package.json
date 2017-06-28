@@ -52,7 +52,7 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^4.0.0",
     "jwt-simple": "^0.5.1",
-    "ptz-core-app": "^1.0.0",
-    "ptz-user-domain": "^1.8.0"
+    "@alanmarcell/ptz-core-app": "^0.0.0",
+    "@alanmarcell/ptz-user-domain": "^0.0.0"
   }
 }
