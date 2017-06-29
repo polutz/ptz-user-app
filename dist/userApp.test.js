@@ -6,7 +6,7 @@ var _dotenv2 = _interopRequireDefault(_dotenv);
 
 var _ptzAssert = require('ptz-assert');
 
-var _ptzUserDomain = require('ptz-user-domain');
+var _ptzUserDomain = require('@alanmarcell/ptz-user-domain');
 
 var _sinon = require('sinon');
 
@@ -26,16 +26,17 @@ var authedUser = {
 };
 var calledOnce = 'calledOnce',
     notCalled = 'notCalled';
+var userRepository;
+var userApp;
+beforeEach(function () {
+    userRepository = (0, _UserRepositoryFake.createUserRepoFake)();
+    (0, _sinon.spy)(userRepository, 'save');
+    (0, _sinon.stub)(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
+    userApp = (0, _index.createApp)({ userRepository: userRepository });
+});
 describe('UserApp', function () {
     describe('saveUser', function () {
         describe('insert', function () {
-            var userApp, userRepository;
-            beforeEach(function () {
-                userRepository = new _UserRepositoryFake.UserRepositoryFake(null);
-                (0, _sinon.spy)(userRepository, 'save');
-                (0, _sinon.stub)(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
-                userApp = new _index.UserApp({ userRepository: userRepository });
-            });
             it('hash password', _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
                 var userArgs, user;
                 return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -141,38 +142,35 @@ describe('UserApp', function () {
         });
         describe('update', function () {
             it('update when new user data is valid', _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-                var userRepository, dbUser, userApp, userArgs, userSaved;
+                var dbUser, userArgs, userSaved;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
                         switch (_context5.prev = _context5.next) {
                             case 0:
-                                userRepository = new _UserRepositoryFake.UserRepositoryFake(null);
-
-                                (0, _sinon.spy)(userRepository, 'save');
-                                (0, _sinon.stub)(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
-                                dbUser = new _ptzUserDomain.User({
+                                // spy(userRepository, 'save');
+                                // stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
+                                dbUser = {
                                     userName: 'angeloocana',
                                     email: 'angeloocana@gmail.com',
                                     displayName: 'Angelo Ocana'
-                                });
+                                };
 
                                 (0, _sinon.stub)(userRepository, 'getById').returns(dbUser);
-                                userApp = new _index.UserApp({ userRepository: userRepository });
                                 userArgs = {
                                     userName: 'angeloocana',
                                     email: 'angeloocana@gmail.com',
                                     displayName: 'Angelo Ocana Updated'
                                 };
-                                _context5.next = 9;
+                                _context5.next = 5;
                                 return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
 
-                            case 9:
+                            case 5:
                                 userSaved = _context5.sent;
 
                                 (0, _ptzAssert.ok)(userRepository.save[calledOnce]);
                                 (0, _ptzAssert.equal)(userSaved.displayName, userArgs.displayName);
 
-                            case 12:
+                            case 8:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -182,11 +180,6 @@ describe('UserApp', function () {
         });
     });
     describe('authUser', function () {
-        var userApp, userRepository;
-        beforeEach(function () {
-            userRepository = new _UserRepositoryFake.UserRepositoryFake(null);
-            userApp = new _index.UserApp({ userRepository: userRepository });
-        });
         it('return null when User not found', _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
             var userNameOrEmail, password, user;
             return regeneratorRuntime.wrap(function _callee6$(_context6) {
@@ -221,7 +214,7 @@ describe('UserApp', function () {
                     switch (_context7.prev = _context7.next) {
                         case 0:
                             password = 'testeteste';
-                            user = new _ptzUserDomain.User({
+                            user = (0, _ptzUserDomain.createUser)({
                                 userName: 'angeloocana',
                                 email: '',
                                 displayName: '',
@@ -262,7 +255,7 @@ describe('UserApp', function () {
                     switch (_context8.prev = _context8.next) {
                         case 0:
                             password = 'testeteste';
-                            user = new _ptzUserDomain.User({
+                            user = (0, _ptzUserDomain.createUser)({
                                 userName: 'angeloocana',
                                 email: 'alanmarcell@live.com',
                                 displayName: 'Angelo Ocana',
@@ -300,16 +293,13 @@ describe('UserApp', function () {
     });
     describe('getAuthToken', function () {
         it('add errors when invalid userName or Email', _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
-            var userRepository, userApp, authToken;
+            var authToken;
             return regeneratorRuntime.wrap(function _callee9$(_context9) {
                 while (1) {
                     switch (_context9.prev = _context9.next) {
                         case 0:
-                            userRepository = new _UserRepositoryFake.UserRepositoryFake(null);
-                            userApp = new _index.UserApp({ userRepository: userRepository });
-
                             (0, _sinon.spy)(userRepository, 'getByUserNameOrEmail');
-                            _context9.next = 5;
+                            _context9.next = 3;
                             return userApp.getAuthToken({
                                 form: {
                                     userNameOrEmail: 'ln',
@@ -318,15 +308,17 @@ describe('UserApp', function () {
                                 authedUser: authedUser
                             });
 
-                        case 5:
+                        case 3:
                             authToken = _context9.sent;
 
+                            // console.log('\n\n\nauthToken');
+                            // console.log(authToken);
                             (0, _ptzAssert.ok)(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
                             (0, _ptzAssert.notOk)(authToken.authToken, 'Do NOT Generate token');
                             (0, _ptzAssert.notOk)(authToken.user, 'DO NOT return user');
                             (0, _ptzAssert.notEmptyArray)(authToken.errors, 'return errors');
 
-                        case 10:
+                        case 8:
                         case 'end':
                             return _context9.stop();
                     }
@@ -334,16 +326,13 @@ describe('UserApp', function () {
             }, _callee9, undefined);
         })));
         it('add error when invalid password', _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
-            var userRepository, userApp, authToken;
+            var authToken;
             return regeneratorRuntime.wrap(function _callee10$(_context10) {
                 while (1) {
                     switch (_context10.prev = _context10.next) {
                         case 0:
-                            userRepository = new _UserRepositoryFake.UserRepositoryFake(null);
-                            userApp = new _index.UserApp({ userRepository: userRepository });
-
                             (0, _sinon.spy)(userRepository, 'getByUserNameOrEmail');
-                            _context10.next = 5;
+                            _context10.next = 3;
                             return userApp.getAuthToken({
                                 form: {
                                     userNameOrEmail: 'angeloocana',
@@ -352,7 +341,7 @@ describe('UserApp', function () {
                                 authedUser: authedUser
                             });
 
-                        case 5:
+                        case 3:
                             authToken = _context10.sent;
 
                             (0, _ptzAssert.ok)(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
@@ -360,7 +349,7 @@ describe('UserApp', function () {
                             (0, _ptzAssert.notOk)(authToken.user, 'DO NOT return user');
                             (0, _ptzAssert.notEmptyArray)(authToken.errors, 'return errors');
 
-                        case 10:
+                        case 8:
                         case 'end':
                             return _context10.stop();
                     }
@@ -368,26 +357,24 @@ describe('UserApp', function () {
             }, _callee10, undefined);
         })));
         it('generate token when correct password', _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
-            var userRepository, userApp, user, authToken;
+            var user, authToken;
             return regeneratorRuntime.wrap(function _callee11$(_context11) {
                 while (1) {
                     switch (_context11.prev = _context11.next) {
                         case 0:
-                            userRepository = new _UserRepositoryFake.UserRepositoryFake(null);
-                            userApp = new _index.UserApp({ userRepository: userRepository });
-                            user = new _ptzUserDomain.User({
+                            user = (0, _ptzUserDomain.createUser)({
                                 userName: 'lnsilva',
                                 email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
                                 password: '123456'
                             });
-                            _context11.next = 5;
+                            _context11.next = 3;
                             return userApp.hashPassword(user);
 
-                        case 5:
+                        case 3:
                             user = _context11.sent;
 
                             (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
-                            _context11.next = 9;
+                            _context11.next = 7;
                             return userApp.getAuthToken({
                                 form: {
                                     userNameOrEmail: 'lnsilva',
@@ -396,7 +383,7 @@ describe('UserApp', function () {
                                 authedUser: authedUser
                             });
 
-                        case 9:
+                        case 7:
                             authToken = _context11.sent;
 
                             (0, _ptzAssert.ok)(authToken.authToken, 'Empty Token');
@@ -404,7 +391,7 @@ describe('UserApp', function () {
                             (0, _ptzAssert.ok)(authToken.user.id, 'no user id');
                             (0, _ptzAssert.emptyArray)(authToken.errors, 'return errors');
 
-                        case 14:
+                        case 12:
                         case 'end':
                             return _context11.stop();
                     }
@@ -412,16 +399,13 @@ describe('UserApp', function () {
             }, _callee11, undefined);
         })));
         it('add errors when incorrect password', _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
-            var userRepository, userApp, authToken;
+            var authToken;
             return regeneratorRuntime.wrap(function _callee12$(_context12) {
                 while (1) {
                     switch (_context12.prev = _context12.next) {
                         case 0:
-                            userRepository = new _UserRepositoryFake.UserRepositoryFake(null);
-                            userApp = new _index.UserApp({ userRepository: userRepository });
-
                             (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(null);
-                            _context12.next = 5;
+                            _context12.next = 3;
                             return userApp.getAuthToken({
                                 form: {
                                     userNameOrEmail: 'lnsilva',
@@ -430,14 +414,14 @@ describe('UserApp', function () {
                                 authedUser: authedUser
                             });
 
-                        case 5:
+                        case 3:
                             authToken = _context12.sent;
 
                             (0, _ptzAssert.notOk)(authToken.authToken, 'do not generate token');
                             (0, _ptzAssert.notOk)(authToken.user, 'do not return user');
                             (0, _ptzAssert.contains)(authToken.errors, _ptzUserDomain.allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD, 'return invalid userName, email or password error');
 
-                        case 9:
+                        case 7:
                         case 'end':
                             return _context12.stop();
                     }
@@ -446,11 +430,6 @@ describe('UserApp', function () {
         })));
     });
     describe('verifyAuthToken', function () {
-        var userApp, userRepository;
-        beforeEach(function () {
-            userRepository = new _UserRepositoryFake.UserRepositoryFake(null);
-            userApp = new _index.UserApp({ userRepository: userRepository });
-        });
         it('Invalid token throws exception', _asyncToGenerator(regeneratorRuntime.mark(function _callee13() {
             var hasError;
             return regeneratorRuntime.wrap(function _callee13$(_context13) {
@@ -491,7 +470,7 @@ describe('UserApp', function () {
                 while (1) {
                     switch (_context14.prev = _context14.next) {
                         case 0:
-                            user = new _ptzUserDomain.User({
+                            user = (0, _ptzUserDomain.createUser)({
                                 userName: 'lnsilva',
                                 email: 'lucas.neris@globalpoints.com.br',
                                 displayName: 'Lucas Neris',
@@ -556,10 +535,8 @@ describe('UserApp', function () {
     });
     describe('findUsers', function () {
         it('call repository', function () {
-            var userRepository = new _UserRepositoryFake.UserRepositoryFake(null);
             var dbUsers = [];
             (0, _sinon.stub)(userRepository, 'find').returns(dbUsers);
-            var userApp = new _index.UserApp({ userRepository: userRepository });
             var query = {};
             var options = { limit: 4 };
             var users = userApp.findUsers({ authedUser: authedUser, options: options, query: query });

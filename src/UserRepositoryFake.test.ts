@@ -1,4 +1,4 @@
-import { deepEqual } from 'ptz-assert';
+import { deepEqual, equal } from 'ptz-assert';
 import { getByUserNameOrEmail, getOtherUsersWithSameUserNameOrEmail } from './UserRepositoryFake';
 
 describe('UserRepositoryFake', () => {
@@ -7,9 +7,8 @@ describe('UserRepositoryFake', () => {
         deepEqual(otherUsers, []);
     });
 
-    it('getByUserNameOrEmail',  () => {
-        // const userRepository = new UserRepositoryFake(null);
-        const otherUsers =  getByUserNameOrEmail(null);
-        deepEqual(otherUsers, null);
+    it('getByUserNameOrEmail',  async () => {
+        const otherUsers =  await getByUserNameOrEmail(null);
+        equal(otherUsers, null);
     });
 });

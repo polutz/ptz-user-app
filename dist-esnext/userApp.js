@@ -1,111 +1,248 @@
+// import { BaseApp } from '@alanmarcell/ptz-core-app';
+import { allErrors, authUserForm, 
+// AuthUserForm,
+createUser, otherUsersWithSameUserNameOrEmail, updateUser, 
+// User,
+users as usersToSeed } from '@alanmarcell/ptz-user-domain';
+import * as V from '@alanmarcell/ptz-validations';
 import { compare, hash } from 'bcryptjs';
 import { decode, encode } from 'jwt-simple';
-import { BaseApp } from 'ptz-core-app';
-import { allErrors, AuthUserForm, User, users as usersToSeed } from 'ptz-user-domain';
-export default class UserApp extends BaseApp {
-    constructor(userAppArgs) {
-        super(userAppArgs);
-        // TODO: Actions
-        // static actions = {
-        //     SAVE: 'USER_APP_SAVE',
-        //     GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
-        // };
-        this.tokenSecret = process.env.PASSWORD_SALT;
-        this.passwordSalt = process.env.PASSWORD_SALT;
-        this.userRepository = userAppArgs.userRepository;
-    }
-    // TODO: Actions
-    // async execAction(action) {
-    //     switch (action.type) {
-    //         case UserApp.actions.SAVE:
-    //             return await this.saveUser(action.args);
-    //         case UserApp.actions.GET_AUTH_TOKEN:
-    //             return await this.getAuthToken(action.args);
-    //     }
-    // }
-    async hashPassword(user) {
-        if (!user.password)
-            return Promise.resolve(user);
-        if (!this.passwordSalt)
-            throw new Error('passwordSalt not added to process.env.');
-        user.passwordHash = await hash(user.password, this.passwordSalt);
-        user.password = undefined;
+import R from 'ramda';
+// TODO: Actions
+// static actions = {
+//     SAVE: 'USER_APP_SAVE',
+//     GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
+// };
+export let tokenSecret = process.env.PASSWORD_SALT;
+export let passwordSalt = process.env.PASSWORD_SALT;
+const getSalt = () => {
+    tokenSecret = process.env.PASSWORD_SALT;
+    passwordSalt = process.env.PASSWORD_SALT;
+};
+// const userRepository: IUserRepository;
+// constructor(userAppArgs: IUserAppArgs) {
+//     super(userAppArgs);
+//     this.userRepository = userAppArgs.userRepository;
+// }
+// TODO: Actions
+// async execAction(action) {
+//     switch (action.type) {
+//         case UserApp.actions.SAVE:
+//             return await this.saveUser(action.args);
+//         case UserApp.actions.GET_AUTH_TOKEN:
+//             return await this.getAuthToken(action.args);
+//     }
+// }
+export const createApp = (userAppArgs) => {
+    getSalt();
+    const userRepository = userAppArgs.userRepository;
+    return {
+        // userRepository: userAppArgs.userRepository,
+        // log: userAppArgs.log,
+        saveUser: saveUser(userRepository),
+        findUsers: findUsers(userRepository),
+        authUser: authUser(userRepository),
+        getAuthToken: getAuthToken(userRepository),
+        verifyAuthToken: verifyAuthToken(userRepository),
+        updatePassword,
+        updatePasswordToken,
+        deleteUser,
+        hashPassword,
+        seed
+    };
+};
+// export const passwordSalt = 'txt';
+export async function hashPassword(user) {
+    if (!user.password)
         return Promise.resolve(user);
-    }
-    async saveUser(args) {
-        args.userArgs.createdBy = args.authedUser;
-        var user = new User(args.userArgs);
-        user = await this.hashPassword(user);
-        if (!user.isValid())
-            return Promise.resolve(user);
-        const otherUsers = await this.userRepository.getOtherUsersWithSameUserNameOrEmail(user);
-        if (user.otherUsersWithSameUserNameOrEmail(otherUsers))
-            return Promise.resolve(user);
-        const userDb = await this.userRepository.getById(user.id);
-        if (userDb)
-            user = userDb.update(user);
-        user = await this.userRepository.save(user);
+    if (!passwordSalt)
+        throw new Error('passwordSalt not added to process.env.');
+    user.passwordHash = await hash(user.password, passwordSalt);
+    user.password = undefined;
+    return Promise.resolve(user);
+}
+export const saveUser = R.curry(async (userRepository, args) => {
+    args.userArgs.createdBy = args.authedUser;
+    var user = createUser(args.userArgs);
+    user = await hashPassword(user);
+    if (!V.isValid(user))
         return Promise.resolve(user);
-    }
-    findUsers(args) {
-        return this.userRepository.find(args.query, { limit: args.options.limit });
-    }
-    async authUser(args) {
-        const { form } = args;
-        const user = await this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
-        if (!user)
-            return Promise.resolve(null);
-        const isPasswordCorrect = await compare(form.password, user.passwordHash);
-        return Promise.resolve(isPasswordCorrect ? user : null);
-    }
-    async getAuthToken(args) {
-        const form = new AuthUserForm(args.form);
-        var authToken = null;
-        if (!form.isValid())
-            return Promise.resolve({
-                authToken,
-                user: null,
-                errors: form.errors
-            });
-        const user = await this.authUser(args);
-        const errors = [];
-        if (user == null)
-            errors.push(allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);
-        else
-            authToken = encode(user, this.tokenSecret);
+    const otherUsers = await userRepository.getOtherUsersWithSameUserNameOrEmail(user);
+    user = otherUsersWithSameUserNameOrEmail(user, otherUsers);
+    if (!V.isValid(user))
+        return Promise.resolve(user);
+    const userDb = await userRepository.getById(user.id);
+    if (userDb)
+        user = updateUser(userDb, user);
+    user = await userRepository.save(user);
+    return Promise.resolve(user);
+});
+export const findUsers = R.curry((userRepository, args) => {
+    return userRepository.find(args.query, { limit: args.options.limit });
+});
+export const authUser = R.curry(async (userRepository, args) => {
+    const { form } = args;
+    const user = await userRepository.getByUserNameOrEmail(form.userNameOrEmail);
+    if (!user)
+        return Promise.resolve(null);
+    const isPasswordCorrect = await compare(form.password, user.passwordHash);
+    return Promise.resolve(isPasswordCorrect ? user : null);
+});
+export const getAuthToken = R.curry(async (userRepository, args) => {
+    const form = authUserForm(args.form);
+    var authToken = null;
+    if (!V.isValid(form))
         return Promise.resolve({
             authToken,
-            user,
-            errors
+            user: null,
+            errors: form.errors
         });
-    }
-    verifyAuthToken(args) {
-        const user = decode(args.token, this.passwordSalt);
-        return Promise.resolve(user);
-    }
-    async seed(users = usersToSeed.allUsers) {
-        this.log('seeding users', users);
-        const authedUser = {
-            ip: '',
-            dtCreated: new Date(),
-            user: {
-                displayName: 'Seed',
-                id: 'ptz-user-app UserApp.seed()',
-                email: '',
-                userName: ''
-            }
-        };
-        users.forEach(async (user) => await this.saveUser({ userArgs: user, authedUser }));
-        return Promise.resolve();
-    }
-    async updatePassword(args) {
-        return Promise.resolve(false);
-    }
-    async updatePasswordToken(args) {
-        return Promise.resolve(false);
-    }
-    async deleteUser(args) {
-        return Promise.resolve(false);
-    }
-}
+    const user = await authUser(userRepository, args);
+    const errors = [];
+    if (user == null)
+        errors.push(allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);
+    else
+        authToken = encode(user, tokenSecret);
+    return Promise.resolve({
+        authToken,
+        user,
+        errors
+    });
+});
+// tslint:disable-next-line:max-line-length
+export const verifyAuthToken = R.curry((userRepository, args) => {
+    const user = decode(args.token, passwordSalt);
+    return Promise.resolve(user);
+});
+export const seed = (repository) => {
+    const users = usersToSeed.allUsers;
+    const authedUser = {
+        ip: '',
+        dtCreated: new Date(),
+        user: {
+            displayName: 'Seed',
+            id: 'ptz-user-app UserApp.seed()',
+            email: '',
+            userName: ''
+        }
+    };
+    return users.forEach(async (user) => await saveUser(repository, { userArgs: user, authedUser }));
+    // };
+};
+export const updatePassword = (args) => {
+    return Promise.resolve(false);
+};
+export const updatePasswordToken = (args) => {
+    return Promise.resolve(false);
+};
+export const deleteUser = (args) => {
+    return Promise.resolve(false);
+};
+// export default class UserApp extends BaseApp implements IUserApp {
+//     // TODO: Actions
+//     // static actions = {
+//     //     SAVE: 'USER_APP_SAVE',
+//     //     GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
+//     // };
+//     tokenSecret = process.env.PASSWORD_SALT;
+//     passwordSalt = process.env.PASSWORD_SALT;
+//     private userRepository: IUserRepository;
+//     constructor(userAppArgs: IUserAppArgs) {
+//         super(userAppArgs);
+//         this.userRepository = userAppArgs.userRepository;
+//     }
+//     // TODO: Actions
+//     // async execAction(action) {
+//     //     switch (action.type) {
+//     //         case UserApp.actions.SAVE:
+//     //             return await this.saveUser(action.args);
+//     //         case UserApp.actions.GET_AUTH_TOKEN:
+//     //             return await this.getAuthToken(action.args);
+//     //     }
+//     // }
+//     async hashPassword(user: IUser): Promise<IUser> {
+//         if (!user.password)
+//             return Promise.resolve(user);
+//         if (!this.passwordSalt)
+//             throw new Error('passwordSalt not added to process.env.');
+//         user.passwordHash = await hash(user.password, this.passwordSalt);
+//         user.password = undefined;
+//         return Promise.resolve(user);
+//     }
+//     async saveUser(args: ISaveUserArgs): Promise<IUser> {
+//         args.userArgs.createdBy = args.authedUser;
+//         var user: IUser = new User(args.userArgs);
+//         user = await this.hashPassword(user);
+//         if (!user.isValid())
+//             return Promise.resolve(user);
+//         const otherUsers = await this.userRepository.getOtherUsersWithSameUserNameOrEmail(user);
+//         if (user.otherUsersWithSameUserNameOrEmail(otherUsers))
+//             return Promise.resolve(user);
+//         const userDb = await this.userRepository.getById(user.id);
+//         if (userDb)
+//             user = userDb.update(user);
+//         user = await this.userRepository.save(user);
+//         return Promise.resolve(user);
+//     }
+//     findUsers(args: IFindUsersArgs): Promise<IUser[]> {
+//         return this.userRepository.find(args.query, { limit: args.options.limit });
+//     }
+//     async authUser(args: IAuthUserArgs): Promise<IUser> {
+//         const { form } = args;
+//         const user = await this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
+//         if (!user)
+//             return Promise.resolve(null);
+//         const isPasswordCorrect = await compare(form.password, user.passwordHash);
+//         return Promise.resolve(isPasswordCorrect ? user : null);
+//     }
+//     async getAuthToken(args: IAuthUserArgs): Promise<IAuthToken> {
+//         const form = new AuthUserForm(args.form);
+//         var authToken = null;
+//         if (!form.isValid())
+//             return Promise.resolve({
+//                 authToken,
+//                 user: null,
+//                 errors: form.errors
+//             });
+//         const user = await this.authUser(args);
+//         const errors = [];
+//         if (user == null)
+//             errors.push(allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);
+//         else
+//             authToken = encode(user, this.tokenSecret);
+//         return Promise.resolve({
+//             authToken,
+//             user,
+//             errors
+//         });
+//     }
+//     verifyAuthToken(args: IVerifyAuthTokenArgs): Promise<User> {
+//         const user = decode(args.token, this.passwordSalt);
+//         return Promise.resolve(user);
+//     }
+//     async seed(users = usersToSeed.allUsers): Promise<void> {
+//         this.log('seeding users', users);
+//         const authedUser: ICreatedBy = {
+//             ip: '',
+//             dtCreated: new Date(),
+//             user: {
+//                 displayName: 'Seed',
+//                 id: 'ptz-user-app UserApp.seed()',
+//                 email: '',
+//                 userName: ''
+//             }
+//         };
+//         users.forEach(async user => await this.saveUser({ userArgs: user, authedUser }));
+//         return Promise.resolve();
+//     }
+//     async updatePassword(args: IUpdatePasswordArgs): Promise<boolean> {
+//         return Promise.resolve(false);
+//     }
+//     async updatePasswordToken(args: IUpdatePasswordTokenArgs): Promise<boolean> {
+//         return Promise.resolve(false);
+//     }
+//     async deleteUser(args: IDeleteUserArgs): Promise<boolean> {
+//         return Promise.resolve(false);
+//     }
+// }
 //# sourceMappingURL=userApp.js.map

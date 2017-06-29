@@ -1,3 +1,2 @@
-import UserApp from './userApp';
-export { UserApp };
+export * from './userApp';
 //# sourceMappingURL=index.js.map

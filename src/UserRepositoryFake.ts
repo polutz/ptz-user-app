@@ -1,27 +1,21 @@
-// import {  } from '@alanmarcell/ptz-core-app';
+import { createRepository } from '@alanmarcell/ptz-core-app';
 import { IUser } from '@alanmarcell/ptz-user-domain';
 
-const entities = [];
-
-export const getOtherUsersWithSameUserNameOrEmail = (user: IUser) => {
-    return entities;
+export let entities = [];
+export const createUserRepoFake = () => {
+    entities = [];
+    const repo = createRepository('collectionFake', 'urlFake');
+    // tslint:disable-next-line:no-string-literal
+    repo['getByUserNameOrEmail'] = getByUserNameOrEmail;
+    // tslint:disable-next-line:no-string-literal
+    repo['getOtherUsersWithSameUserNameOrEmail'] = getOtherUsersWithSameUserNameOrEmail;
+    return repo;
 };
 
-export const getByUserNameOrEmail = (userNameOrEmail: string) => {
-    return entities[0];
+export const getOtherUsersWithSameUserNameOrEmail = (user: IUser): Promise<IUser[]> => {
+    return Promise.resolve(entities);
 };
 
-// export class UserRepositoryFake extends BaseRepositoryFake implements IUserRepository {
-
-//     constructor(db) {
-//         super(db, 'users');
-//     }
-
-//     getOtherUsersWithSameUserNameOrEmail(user: IUser): Promise<IUser[]> {
-//         return Promise.resolve(this.entities);
-//     }
-
-//     getByUserNameOrEmail(userNameOrEmail: string): Promise<IUser> {
-//         return Promise.resolve(this.entities[0]);
-//     }
-// }
+export const getByUserNameOrEmail = (userNameOrEmail: string): Promise<IUser> => {
+    return Promise.resolve(entities[0]);
+};
