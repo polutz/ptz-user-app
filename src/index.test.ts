@@ -1,10 +1,10 @@
 import { ok } from 'ptz-assert';
-import { UserApp } from './index';
+import * as Core from './index';
 
 describe('ptz-user-app', () => {
     describe('exports', () => {
         // TODO: Actions after ptz-validations
         // it('Action', () => ok(ActionExecution));
-        it('UserApp', () => ok(UserApp));
+        it('authUser', () => ok(Core.authUser));
     });
 });

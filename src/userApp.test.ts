@@ -10,10 +10,12 @@ import {
     ok
 } from 'ptz-assert';
 
-import { allErrors, ICreatedBy, IUser, IUserApp, IUserArgs, IUserRepository, User } from 'ptz-user-domain';
+import {
+    allErrors, createUser, ICreatedBy, IUserApp, IUserArgs
+} from '@alanmarcell/ptz-user-domain';
 import { spy, stub } from 'sinon';
-import { UserApp } from './index';
-import { UserRepositoryFake } from './UserRepositoryFake';
+import { createApp } from './index';
+import { createUserRepoFake } from './UserRepositoryFake';
 
 const authedUser: ICreatedBy = {
     dtCreated: new Date(),
@@ -22,21 +24,19 @@ const authedUser: ICreatedBy = {
 
 const calledOnce = 'calledOnce',
     notCalled = 'notCalled';
+var userRepository;
+var userApp: IUserApp;
 
+beforeEach(() => {
+    userRepository = createUserRepoFake();
+    spy(userRepository, 'save');
+    stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
+
+    userApp = createApp({ userRepository });
+});
 describe('UserApp', () => {
     describe('saveUser', () => {
         describe('insert', () => {
-            var userApp: IUserApp,
-                userRepository: IUserRepository;
-
-            beforeEach(() => {
-                userRepository = new UserRepositoryFake(null);
-
-                spy(userRepository, 'save');
-                stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
-
-                userApp = new UserApp({ userRepository });
-            });
 
             it('hash password', async () => {
                 const userArgs: IUserArgs = {
@@ -85,20 +85,17 @@ describe('UserApp', () => {
 
         describe('update', () => {
             it('update when new user data is valid', async () => {
-                const userRepository = new UserRepositoryFake(null);
 
-                spy(userRepository, 'save');
-                stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
+                // spy(userRepository, 'save');
+                // stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
 
-                const dbUser = new User({
+                const dbUser = {
                     userName: 'angeloocana',
                     email: 'angeloocana@gmail.com',
                     displayName: 'Angelo Ocana'
-                });
+                };
 
                 stub(userRepository, 'getById').returns(dbUser);
-
-                const userApp = new UserApp({ userRepository });
 
                 const userArgs: IUserArgs = {
                     userName: 'angeloocana',
@@ -114,13 +111,6 @@ describe('UserApp', () => {
     });
 
     describe('authUser', () => {
-        var userApp: IUserApp,
-            userRepository: IUserRepository;
-
-        beforeEach(() => {
-            userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp({ userRepository });
-        });
 
         it('return null when User not found', async () => {
             const userNameOrEmail = 'angeloocana',
@@ -139,7 +129,7 @@ describe('UserApp', () => {
         it('return null when User found but incorrect password', async () => {
             const password = 'testeteste';
 
-            var user: IUser = new User({
+            var user = createUser({
                 userName: 'angeloocana',
                 email: '',
                 displayName: '',
@@ -164,7 +154,7 @@ describe('UserApp', () => {
         it('return user when correct password', async () => {
             const password = 'testeteste';
 
-            var user: IUser = new User({
+            var user = createUser({
                 userName: 'angeloocana',
                 email: 'alanmarcell@live.com',
                 displayName: 'Angelo Ocana',
@@ -190,8 +180,6 @@ describe('UserApp', () => {
 
     describe('getAuthToken', () => {
         it('add errors when invalid userName or Email', async () => {
-            const userRepository = new UserRepositoryFake(null);
-            const userApp = new UserApp({ userRepository });
 
             spy(userRepository, 'getByUserNameOrEmail');
             const authToken = await userApp.getAuthToken({
@@ -209,8 +197,6 @@ describe('UserApp', () => {
         });
 
         it('add error when invalid password', async () => {
-            const userRepository = new UserRepositoryFake(null);
-            const userApp = new UserApp({ userRepository });
 
             spy(userRepository, 'getByUserNameOrEmail');
 
@@ -229,10 +215,8 @@ describe('UserApp', () => {
         });
 
         it('generate token when correct password', async () => {
-            const userRepository = new UserRepositoryFake(null);
-            const userApp = new UserApp({ userRepository });
 
-            var user: IUser = new User({
+            var user = createUser({
                 userName: 'lnsilva'
                 , email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
                 password: '123456'
@@ -256,8 +240,6 @@ describe('UserApp', () => {
         });
 
         it('add errors when incorrect password', async () => {
-            const userRepository = new UserRepositoryFake(null);
-            const userApp = new UserApp({ userRepository });
 
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
 
@@ -278,13 +260,6 @@ describe('UserApp', () => {
     });
 
     describe('verifyAuthToken', () => {
-        var userApp: IUserApp,
-            userRepository: IUserRepository;
-
-        beforeEach(() => {
-            userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp({ userRepository });
-        });
 
         it('Invalid token throws exception', async () => {
             var hasError = false;
@@ -300,7 +275,7 @@ describe('UserApp', () => {
         });
 
         it('Valid token return user', async () => {
-            var user: IUser = new User({
+            var user = createUser({
                 userName: 'lnsilva',
                 email: 'lucas.neris@globalpoints.com.br',
                 displayName: 'Lucas Neris',
@@ -355,12 +330,9 @@ describe('UserApp', () => {
 
     describe('findUsers', () => {
         it('call repository', () => {
-            const userRepository = new UserRepositoryFake(null);
 
             const dbUsers = [];
             stub(userRepository, 'find').returns(dbUsers);
-
-            const userApp = new UserApp({ userRepository });
 
             const query = {};
 

@@ -1,25 +1,26 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import { contains, emptyArray, equal, notEmptyArray, notOk, ok } from 'ptz-assert';
-import { allErrors, User } from 'ptz-user-domain';
+import { allErrors, createUser } from '@alanmarcell/ptz-user-domain';
 import { spy, stub } from 'sinon';
-import { UserApp } from './index';
-import { UserRepositoryFake } from './UserRepositoryFake';
+import { createApp } from './index';
+import { createUserRepoFake } from './UserRepositoryFake';
 const authedUser = {
     dtCreated: new Date(),
     ip: '192.161.0.1'
 };
 const calledOnce = 'calledOnce', notCalled = 'notCalled';
+var userRepository;
+var userApp;
+beforeEach(() => {
+    userRepository = createUserRepoFake();
+    spy(userRepository, 'save');
+    stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
+    userApp = createApp({ userRepository });
+});
 describe('UserApp', () => {
     describe('saveUser', () => {
         describe('insert', () => {
-            var userApp, userRepository;
-            beforeEach(() => {
-                userRepository = new UserRepositoryFake(null);
-                spy(userRepository, 'save');
-                stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
-                userApp = new UserApp({ userRepository });
-            });
             it('hash password', async () => {
                 const userArgs = {
                     userName: 'angeloocana',
@@ -61,16 +62,14 @@ describe('UserApp', () => {
         });
         describe('update', () => {
             it('update when new user data is valid', async () => {
-                const userRepository = new UserRepositoryFake(null);
-                spy(userRepository, 'save');
-                stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
-                const dbUser = new User({
+                // spy(userRepository, 'save');
+                // stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
+                const dbUser = {
                     userName: 'angeloocana',
                     email: 'angeloocana@gmail.com',
                     displayName: 'Angelo Ocana'
-                });
+                };
                 stub(userRepository, 'getById').returns(dbUser);
-                const userApp = new UserApp({ userRepository });
                 const userArgs = {
                     userName: 'angeloocana',
                     email: 'angeloocana@gmail.com',
@@ -83,11 +82,6 @@ describe('UserApp', () => {
         });
     });
     describe('authUser', () => {
-        var userApp, userRepository;
-        beforeEach(() => {
-            userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp({ userRepository });
-        });
         it('return null when User not found', async () => {
             const userNameOrEmail = 'angeloocana', password = 'teste';
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
@@ -99,7 +93,7 @@ describe('UserApp', () => {
         });
         it('return null when User found but incorrect password', async () => {
             const password = 'testeteste';
-            var user = new User({
+            var user = createUser({
                 userName: 'angeloocana',
                 email: '',
                 displayName: '',
@@ -118,7 +112,7 @@ describe('UserApp', () => {
         });
         it('return user when correct password', async () => {
             const password = 'testeteste';
-            var user = new User({
+            var user = createUser({
                 userName: 'angeloocana',
                 email: 'alanmarcell@live.com',
                 displayName: 'Angelo Ocana',
@@ -139,8 +133,6 @@ describe('UserApp', () => {
     });
     describe('getAuthToken', () => {
         it('add errors when invalid userName or Email', async () => {
-            const userRepository = new UserRepositoryFake(null);
-            const userApp = new UserApp({ userRepository });
             spy(userRepository, 'getByUserNameOrEmail');
             const authToken = await userApp.getAuthToken({
                 form: {
@@ -149,14 +141,14 @@ describe('UserApp', () => {
                 },
                 authedUser
             });
+            // console.log('\n\n\nauthToken');
+            // console.log(authToken);
             ok(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
             notOk(authToken.authToken, 'Do NOT Generate token');
             notOk(authToken.user, 'DO NOT return user');
             notEmptyArray(authToken.errors, 'return errors');
         });
         it('add error when invalid password', async () => {
-            const userRepository = new UserRepositoryFake(null);
-            const userApp = new UserApp({ userRepository });
             spy(userRepository, 'getByUserNameOrEmail');
             const authToken = await userApp.getAuthToken({
                 form: {
@@ -171,9 +163,7 @@ describe('UserApp', () => {
             notEmptyArray(authToken.errors, 'return errors');
         });
         it('generate token when correct password', async () => {
-            const userRepository = new UserRepositoryFake(null);
-            const userApp = new UserApp({ userRepository });
-            var user = new User({
+            var user = createUser({
                 userName: 'lnsilva',
                 email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
                 password: '123456'
@@ -193,8 +183,6 @@ describe('UserApp', () => {
             emptyArray(authToken.errors, 'return errors');
         });
         it('add errors when incorrect password', async () => {
-            const userRepository = new UserRepositoryFake(null);
-            const userApp = new UserApp({ userRepository });
             stub(userRepository, 'getByUserNameOrEmail').returns(null);
             const authToken = await userApp.getAuthToken({
                 form: {
@@ -209,11 +197,6 @@ describe('UserApp', () => {
         });
     });
     describe('verifyAuthToken', () => {
-        var userApp, userRepository;
-        beforeEach(() => {
-            userRepository = new UserRepositoryFake(null);
-            userApp = new UserApp({ userRepository });
-        });
         it('Invalid token throws exception', async () => {
             var hasError = false;
             try {
@@ -228,7 +211,7 @@ describe('UserApp', () => {
             ok(hasError);
         });
         it('Valid token return user', async () => {
-            var user = new User({
+            var user = createUser({
                 userName: 'lnsilva',
                 email: 'lucas.neris@globalpoints.com.br',
                 displayName: 'Lucas Neris',
@@ -271,10 +254,8 @@ describe('UserApp', () => {
     });
     describe('findUsers', () => {
         it('call repository', () => {
-            const userRepository = new UserRepositoryFake(null);
             const dbUsers = [];
             stub(userRepository, 'find').returns(dbUsers);
-            const userApp = new UserApp({ userRepository });
             const query = {};
             const options = { limit: 4 };
             const users = userApp.findUsers({ authedUser, options, query });

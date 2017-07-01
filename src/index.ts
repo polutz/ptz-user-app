@@ -1,5 +1,1 @@
-import UserApp from './userApp';
-
-export {
-    UserApp
-};
+export * from './userApp';
