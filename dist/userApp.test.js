@@ -311,8 +311,6 @@ describe('UserApp', function () {
                         case 3:
                             authToken = _context9.sent;
 
-                            // console.log('\n\n\nauthToken');
-                            // console.log(authToken);
                             (0, _ptzAssert.ok)(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
                             (0, _ptzAssert.notOk)(authToken.authToken, 'Do NOT Generate token');
                             (0, _ptzAssert.notOk)(authToken.user, 'DO NOT return user');
@@ -545,7 +543,27 @@ describe('UserApp', function () {
         });
     });
     describe('seed', function () {
-        it('default users');
+        it('default users', _asyncToGenerator(regeneratorRuntime.mark(function _callee15() {
+            var seeded;
+            return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                while (1) {
+                    switch (_context15.prev = _context15.next) {
+                        case 0:
+                            _context15.next = 2;
+                            return userApp.seed(authedUser);
+
+                        case 2:
+                            seeded = _context15.sent;
+
+                            (0, _ptzAssert.ok)(seeded);
+
+                        case 4:
+                        case 'end':
+                            return _context15.stop();
+                    }
+                }
+            }, _callee15, undefined);
+        })));
         it('custom users');
     });
 });

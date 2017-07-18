@@ -15,6 +15,15 @@ describe('ptz-user-app', function () {
         it('authUser', function () {
             return (0, _ptzAssert.ok)(Core.authUser);
         });
+        it('createApp', function () {
+            return (0, _ptzAssert.ok)(Core.createApp);
+        });
+        it('createUserRepoFake', function () {
+            return (0, _ptzAssert.ok)(Core.createUserRepoFake);
+        });
+        it('deleteUser', function () {
+            return (0, _ptzAssert.ok)(Core.deleteUser);
+        });
     });
 });
 //# sourceMappingURL=index.test.js.map

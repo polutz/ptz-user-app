@@ -346,7 +346,10 @@ describe('UserApp', () => {
     });
 
     describe('seed', () => {
-        it('default users');
+        it('default users', async () => {
+        const seeded = await userApp.seed(authedUser);
+        ok(seeded);
+        });
         it('custom users');
     });
 });

@@ -141,8 +141,6 @@ describe('UserApp', () => {
                 },
                 authedUser
             });
-            // console.log('\n\n\nauthToken');
-            // console.log(authToken);
             ok(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
             notOk(authToken.authToken, 'Do NOT Generate token');
             notOk(authToken.user, 'DO NOT return user');
@@ -264,7 +262,10 @@ describe('UserApp', () => {
         });
     });
     describe('seed', () => {
-        it('default users');
+        it('default users', async () => {
+            const seeded = await userApp.seed(authedUser);
+            ok(seeded);
+        });
         it('custom users');
     });
 });

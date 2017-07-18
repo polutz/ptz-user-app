@@ -5,7 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.deleteUser = exports.updatePasswordToken = exports.updatePassword = exports.seed = exports.verifyAuthToken = exports.getAuthToken = exports.authUser = exports.findUsers = exports.saveUser = exports.hashPassword = exports.createApp = exports.passwordSalt = exports.tokenSecret = undefined;
 
-// export const passwordSalt = 'txt';
 var hashPassword = exports.hashPassword = function () {
     var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(user) {
         return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -52,7 +51,7 @@ var hashPassword = exports.hashPassword = function () {
 
 var _ptzUserDomain = require('@alanmarcell/ptz-user-domain');
 
-var _ptzValidations = require('@alanmarcell/ptz-validations');
+var _ptzValidations = require('ptz-validations');
 
 var V = _interopRequireWildcard(_ptzValidations);
 
@@ -68,40 +67,18 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; } // import { BaseApp } from '@alanmarcell/ptz-core-app';
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-
-// TODO: Actions
-// static actions = {
-//     SAVE: 'USER_APP_SAVE',
-//     GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
-// };
 var tokenSecret = exports.tokenSecret = process.env.PASSWORD_SALT;
 var passwordSalt = exports.passwordSalt = process.env.PASSWORD_SALT;
 var getSalt = function getSalt() {
     exports.tokenSecret = tokenSecret = process.env.PASSWORD_SALT;
     exports.passwordSalt = passwordSalt = process.env.PASSWORD_SALT;
 };
-// const userRepository: IUserRepository;
-// constructor(userAppArgs: IUserAppArgs) {
-//     super(userAppArgs);
-//     this.userRepository = userAppArgs.userRepository;
-// }
-// TODO: Actions
-// async execAction(action) {
-//     switch (action.type) {
-//         case UserApp.actions.SAVE:
-//             return await this.saveUser(action.args);
-//         case UserApp.actions.GET_AUTH_TOKEN:
-//             return await this.getAuthToken(action.args);
-//     }
-// }
 var createApp = exports.createApp = function createApp(userAppArgs) {
     getSalt();
     var userRepository = userAppArgs.userRepository;
     return {
-        // userRepository: userAppArgs.userRepository,
-        // log: userAppArgs.log,
         saveUser: saveUser(userRepository),
         findUsers: findUsers(userRepository),
         authUser: authUser(userRepository),
@@ -111,9 +88,10 @@ var createApp = exports.createApp = function createApp(userAppArgs) {
         updatePasswordToken: updatePasswordToken,
         deleteUser: deleteUser,
         hashPassword: hashPassword,
-        seed: seed
+        seed: seed(userRepository)
     };
-};var saveUser = exports.saveUser = _ramda2.default.curry(function () {
+};
+var saveUser = exports.saveUser = _ramda2.default.curry(function () {
     var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(userRepository, args) {
         var user, otherUsers, userDb;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
@@ -275,19 +253,9 @@ var verifyAuthToken = exports.verifyAuthToken = _ramda2.default.curry(function (
     var user = (0, _jwtSimple.decode)(args.token, passwordSalt);
     return Promise.resolve(user);
 });
-var seed = exports.seed = function seed(repository) {
+var seed = exports.seed = _ramda2.default.curry(function (repository, authedUser) {
     var users = _ptzUserDomain.users.allUsers;
-    var authedUser = {
-        ip: '',
-        dtCreated: new Date(),
-        user: {
-            displayName: 'Seed',
-            id: 'ptz-user-app UserApp.seed()',
-            email: '',
-            userName: ''
-        }
-    };
-    return users.forEach(function () {
+    users.forEach(function () {
         var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(user) {
             return regeneratorRuntime.wrap(function _callee5$(_context5) {
                 while (1) {
@@ -311,8 +279,8 @@ var seed = exports.seed = function seed(repository) {
             return _ref5.apply(this, arguments);
         };
     }());
-    // };
-};
+    return Promise.resolve(true);
+});
 var updatePassword = exports.updatePassword = function updatePassword(args) {
     return Promise.resolve(false);
 };
@@ -322,112 +290,5 @@ var updatePasswordToken = exports.updatePasswordToken = function updatePasswordT
 var deleteUser = exports.deleteUser = function deleteUser(args) {
     return Promise.resolve(false);
 };
-// export default class UserApp extends BaseApp implements IUserApp {
-//     // TODO: Actions
-//     // static actions = {
-//     //     SAVE: 'USER_APP_SAVE',
-//     //     GET_AUTH_TOKEN: 'GET_AUTH_TOKEN'
-//     // };
-//     tokenSecret = process.env.PASSWORD_SALT;
-//     passwordSalt = process.env.PASSWORD_SALT;
-//     private userRepository: IUserRepository;
-//     constructor(userAppArgs: IUserAppArgs) {
-//         super(userAppArgs);
-//         this.userRepository = userAppArgs.userRepository;
-//     }
-//     // TODO: Actions
-//     // async execAction(action) {
-//     //     switch (action.type) {
-//     //         case UserApp.actions.SAVE:
-//     //             return await this.saveUser(action.args);
-//     //         case UserApp.actions.GET_AUTH_TOKEN:
-//     //             return await this.getAuthToken(action.args);
-//     //     }
-//     // }
-//     async hashPassword(user: IUser): Promise<IUser> {
-//         if (!user.password)
-//             return Promise.resolve(user);
-//         if (!this.passwordSalt)
-//             throw new Error('passwordSalt not added to process.env.');
-//         user.passwordHash = await hash(user.password, this.passwordSalt);
-//         user.password = undefined;
-//         return Promise.resolve(user);
-//     }
-//     async saveUser(args: ISaveUserArgs): Promise<IUser> {
-//         args.userArgs.createdBy = args.authedUser;
-//         var user: IUser = new User(args.userArgs);
-//         user = await this.hashPassword(user);
-//         if (!user.isValid())
-//             return Promise.resolve(user);
-//         const otherUsers = await this.userRepository.getOtherUsersWithSameUserNameOrEmail(user);
-//         if (user.otherUsersWithSameUserNameOrEmail(otherUsers))
-//             return Promise.resolve(user);
-//         const userDb = await this.userRepository.getById(user.id);
-//         if (userDb)
-//             user = userDb.update(user);
-//         user = await this.userRepository.save(user);
-//         return Promise.resolve(user);
-//     }
-//     findUsers(args: IFindUsersArgs): Promise<IUser[]> {
-//         return this.userRepository.find(args.query, { limit: args.options.limit });
-//     }
-//     async authUser(args: IAuthUserArgs): Promise<IUser> {
-//         const { form } = args;
-//         const user = await this.userRepository.getByUserNameOrEmail(form.userNameOrEmail);
-//         if (!user)
-//             return Promise.resolve(null);
-//         const isPasswordCorrect = await compare(form.password, user.passwordHash);
-//         return Promise.resolve(isPasswordCorrect ? user : null);
-//     }
-//     async getAuthToken(args: IAuthUserArgs): Promise<IAuthToken> {
-//         const form = new AuthUserForm(args.form);
-//         var authToken = null;
-//         if (!form.isValid())
-//             return Promise.resolve({
-//                 authToken,
-//                 user: null,
-//                 errors: form.errors
-//             });
-//         const user = await this.authUser(args);
-//         const errors = [];
-//         if (user == null)
-//             errors.push(allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);
-//         else
-//             authToken = encode(user, this.tokenSecret);
-//         return Promise.resolve({
-//             authToken,
-//             user,
-//             errors
-//         });
-//     }
-//     verifyAuthToken(args: IVerifyAuthTokenArgs): Promise<User> {
-//         const user = decode(args.token, this.passwordSalt);
-//         return Promise.resolve(user);
-//     }
-//     async seed(users = usersToSeed.allUsers): Promise<void> {
-//         this.log('seeding users', users);
-//         const authedUser: ICreatedBy = {
-//             ip: '',
-//             dtCreated: new Date(),
-//             user: {
-//                 displayName: 'Seed',
-//                 id: 'ptz-user-app UserApp.seed()',
-//                 email: '',
-//                 userName: ''
-//             }
-//         };
-//         users.forEach(async user => await this.saveUser({ userArgs: user, authedUser }));
-//         return Promise.resolve();
-//     }
-//     async updatePassword(args: IUpdatePasswordArgs): Promise<boolean> {
-//         return Promise.resolve(false);
-//     }
-//     async updatePasswordToken(args: IUpdatePasswordTokenArgs): Promise<boolean> {
-//         return Promise.resolve(false);
-//     }
-//     async deleteUser(args: IDeleteUserArgs): Promise<boolean> {
-//         return Promise.resolve(false);
-//     }
-// }
 //# sourceMappingURL=userApp.js.map
 //# sourceMappingURL=userApp.js.map
