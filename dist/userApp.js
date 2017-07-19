@@ -3,51 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.deleteUser = exports.updatePasswordToken = exports.updatePassword = exports.seed = exports.verifyAuthToken = exports.getAuthToken = exports.authUser = exports.findUsers = exports.saveUser = exports.hashPassword = exports.createApp = exports.passwordSalt = exports.tokenSecret = undefined;
-
-var hashPassword = exports.hashPassword = function () {
-    var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(user) {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-            while (1) {
-                switch (_context.prev = _context.next) {
-                    case 0:
-                        if (user.password) {
-                            _context.next = 2;
-                            break;
-                        }
-
-                        return _context.abrupt('return', Promise.resolve(user));
-
-                    case 2:
-                        if (passwordSalt) {
-                            _context.next = 4;
-                            break;
-                        }
-
-                        throw new Error('passwordSalt not added to process.env.');
-
-                    case 4:
-                        _context.next = 6;
-                        return (0, _bcryptjs.hash)(user.password, passwordSalt);
-
-                    case 6:
-                        user.passwordHash = _context.sent;
-
-                        user.password = undefined;
-                        return _context.abrupt('return', Promise.resolve(user));
-
-                    case 9:
-                    case 'end':
-                        return _context.stop();
-                }
-            }
-        }, _callee, this);
-    }));
-
-    return function hashPassword(_x) {
-        return _ref.apply(this, arguments);
-    };
-}();
+exports.deleteUser = exports.updatePasswordToken = exports.updatePassword = exports.seed = exports.verifyAuthToken = exports.getAuthToken = exports.authUser = exports.findUsers = exports.saveUser = exports.hashPassword = exports.createApp = exports.pDecode = exports.pEcode = exports.pHash = exports.passwordSalt = exports.tokenSecret = undefined;
 
 var _ptzUserDomain = require('@alanmarcell/ptz-user-domain');
 
@@ -75,38 +31,95 @@ var getSalt = function getSalt() {
     exports.tokenSecret = tokenSecret = process.env.PASSWORD_SALT;
     exports.passwordSalt = passwordSalt = process.env.PASSWORD_SALT;
 };
+var pHash = exports.pHash = _ramda2.default.curry(function (secret) {
+    return function (user) {
+        return (0, _bcryptjs.hash)(user, secret);
+    };
+});
+var pEcode = exports.pEcode = _ramda2.default.curry(function (secret) {
+    return function (user) {
+        return (0, _jwtSimple.encode)(user, secret);
+    };
+});
+var pDecode = exports.pDecode = _ramda2.default.curry(function (secret) {
+    return function (user) {
+        return (0, _jwtSimple.decode)(user, secret);
+    };
+});
 var createApp = exports.createApp = function createApp(userAppArgs) {
     getSalt();
     var userRepository = userAppArgs.userRepository;
     return {
-        saveUser: saveUser(userRepository),
-        findUsers: findUsers(userRepository),
-        authUser: authUser(userRepository),
-        getAuthToken: getAuthToken(userRepository),
-        verifyAuthToken: verifyAuthToken(userRepository),
+        saveUser: saveUser({
+            userRepository: userRepository,
+            hashPass: hashPassword(pHash(tokenSecret)),
+            createUser: _ptzUserDomain.createUser,
+            isValid: V.isValid,
+            updateUser: _ptzUserDomain.updateUser,
+            otherUsersWithSameUserNameOrEmail: _ptzUserDomain.otherUsersWithSameUserNameOrEmail
+        }),
+        findUsers: findUsers(userRepository.find),
+        authUser: authUser(userRepository.getByUserNameOrEmail),
+        getAuthToken: getAuthToken(_ptzUserDomain.authUserForm, authUser(userRepository.getByUserNameOrEmail), pEcode(tokenSecret)),
+        verifyAuthToken: verifyAuthToken(pDecode(tokenSecret)),
         updatePassword: updatePassword,
         updatePasswordToken: updatePasswordToken,
         deleteUser: deleteUser,
-        hashPassword: hashPassword,
+        hashPassword: hashPassword(pHash(tokenSecret)),
         seed: seed(userRepository)
     };
 };
+var hashPassword = exports.hashPassword = _ramda2.default.curry(function () {
+    var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(hashArg, user) {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+                switch (_context.prev = _context.next) {
+                    case 0:
+                        if (user.password) {
+                            _context.next = 2;
+                            break;
+                        }
+
+                        return _context.abrupt('return', Promise.resolve(user));
+
+                    case 2:
+                        _context.next = 4;
+                        return hashArg(user.password);
+
+                    case 4:
+                        user.passwordHash = _context.sent;
+
+                        user.password = undefined;
+                        return _context.abrupt('return', Promise.resolve(user));
+
+                    case 7:
+                    case 'end':
+                        return _context.stop();
+                }
+            }
+        }, _callee, undefined);
+    }));
+
+    return function (_x, _x2) {
+        return _ref.apply(this, arguments);
+    };
+}());
 var saveUser = exports.saveUser = _ramda2.default.curry(function () {
-    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(userRepository, args) {
+    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(func, args) {
         var user, otherUsers, userDb;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
                         args.userArgs.createdBy = args.authedUser;
-                        user = (0, _ptzUserDomain.createUser)(args.userArgs);
+                        user = func.createUser ? func.createUser(args.userArgs) : (0, _ptzUserDomain.createUser)(args.userArgs);
                         _context2.next = 4;
-                        return hashPassword(user);
+                        return func.hashPass(user);
 
                     case 4:
                         user = _context2.sent;
 
-                        if (V.isValid(user)) {
+                        if (func.isValid(user)) {
                             _context2.next = 7;
                             break;
                         }
@@ -115,12 +128,12 @@ var saveUser = exports.saveUser = _ramda2.default.curry(function () {
 
                     case 7:
                         _context2.next = 9;
-                        return userRepository.getOtherUsersWithSameUserNameOrEmail(user);
+                        return func.userRepository.getOtherUsersWithSameUserNameOrEmail(user);
 
                     case 9:
                         otherUsers = _context2.sent;
 
-                        user = (0, _ptzUserDomain.otherUsersWithSameUserNameOrEmail)(user, otherUsers);
+                        user = func.otherUsersWithSameUserNameOrEmail(user, otherUsers);
 
                         if (V.isValid(user)) {
                             _context2.next = 13;
@@ -131,14 +144,14 @@ var saveUser = exports.saveUser = _ramda2.default.curry(function () {
 
                     case 13:
                         _context2.next = 15;
-                        return userRepository.getById(user.id);
+                        return func.userRepository.getById(user.id);
 
                     case 15:
                         userDb = _context2.sent;
 
-                        if (userDb) user = (0, _ptzUserDomain.updateUser)(userDb, user);
+                        if (userDb) user = func.updateUser(userDb, user);
                         _context2.next = 19;
-                        return userRepository.save(user);
+                        return func.userRepository.save(user);
 
                     case 19:
                         user = _context2.sent;
@@ -152,43 +165,20 @@ var saveUser = exports.saveUser = _ramda2.default.curry(function () {
         }, _callee2, undefined);
     }));
 
-    return function (_x2, _x3) {
+    return function (_x3, _x4) {
         return _ref2.apply(this, arguments);
     };
 }());
-var findUsers = exports.findUsers = _ramda2.default.curry(function (userRepository, args) {
-    return userRepository.find(args.query, { limit: args.options.limit });
-});
-var authUser = exports.authUser = _ramda2.default.curry(function () {
-    var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(userRepository, args) {
-        var form, user, isPasswordCorrect;
+// tslint:disable-next-line:max-line-length
+var findUsers = exports.findUsers = _ramda2.default.curry(function () {
+    var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(find, args) {
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
                     case 0:
-                        form = args.form;
-                        _context3.next = 3;
-                        return userRepository.getByUserNameOrEmail(form.userNameOrEmail);
+                        return _context3.abrupt('return', find(args.query, { limit: args.options.limit }));
 
-                    case 3:
-                        user = _context3.sent;
-
-                        if (user) {
-                            _context3.next = 6;
-                            break;
-                        }
-
-                        return _context3.abrupt('return', Promise.resolve(null));
-
-                    case 6:
-                        _context3.next = 8;
-                        return (0, _bcryptjs.compare)(form.password, user.passwordHash);
-
-                    case 8:
-                        isPasswordCorrect = _context3.sent;
-                        return _context3.abrupt('return', Promise.resolve(isPasswordCorrect ? user : null));
-
-                    case 10:
+                    case 1:
                     case 'end':
                         return _context3.stop();
                 }
@@ -196,45 +186,38 @@ var authUser = exports.authUser = _ramda2.default.curry(function () {
         }, _callee3, undefined);
     }));
 
-    return function (_x4, _x5) {
+    return function (_x5, _x6) {
         return _ref3.apply(this, arguments);
     };
 }());
-var getAuthToken = exports.getAuthToken = _ramda2.default.curry(function () {
-    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(userRepository, args) {
-        var form, authToken, user, errors;
+var authUser = exports.authUser = _ramda2.default.curry(function () {
+    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(getByUserNameOrEmail, args) {
+        var form, user, isPasswordCorrect;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
-                        form = (0, _ptzUserDomain.authUserForm)(args.form);
-                        authToken = null;
+                        form = args.form;
+                        _context4.next = 3;
+                        return getByUserNameOrEmail(form.userNameOrEmail);
 
-                        if (V.isValid(form)) {
-                            _context4.next = 4;
+                    case 3:
+                        user = _context4.sent;
+
+                        if (user) {
+                            _context4.next = 6;
                             break;
                         }
 
-                        return _context4.abrupt('return', Promise.resolve({
-                            authToken: authToken,
-                            user: null,
-                            errors: form.errors
-                        }));
-
-                    case 4:
-                        _context4.next = 6;
-                        return authUser(userRepository, args);
+                        return _context4.abrupt('return', Promise.resolve(null));
 
                     case 6:
-                        user = _context4.sent;
-                        errors = [];
+                        _context4.next = 8;
+                        return (0, _bcryptjs.compare)(form.password, user.passwordHash);
 
-                        if (user == null) errors.push(_ptzUserDomain.allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);else authToken = (0, _jwtSimple.encode)(user, tokenSecret);
-                        return _context4.abrupt('return', Promise.resolve({
-                            authToken: authToken,
-                            user: user,
-                            errors: errors
-                        }));
+                    case 8:
+                        isPasswordCorrect = _context4.sent;
+                        return _context4.abrupt('return', Promise.resolve(isPasswordCorrect ? user : null));
 
                     case 10:
                     case 'end':
@@ -244,39 +227,87 @@ var getAuthToken = exports.getAuthToken = _ramda2.default.curry(function () {
         }, _callee4, undefined);
     }));
 
-    return function (_x6, _x7) {
+    return function (_x7, _x8) {
         return _ref4.apply(this, arguments);
     };
 }());
+var getAuthToken = exports.getAuthToken = _ramda2.default.curry(function () {
+    var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(authUserFormArg, authUserArg, encodeArgs, args) {
+        var form, authToken, user, errors;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            while (1) {
+                switch (_context5.prev = _context5.next) {
+                    case 0:
+                        form = authUserFormArg(args.form);
+                        authToken = null;
+
+                        if (V.isValid(form)) {
+                            _context5.next = 4;
+                            break;
+                        }
+
+                        return _context5.abrupt('return', Promise.resolve({
+                            authToken: authToken,
+                            user: null,
+                            errors: form.errors
+                        }));
+
+                    case 4:
+                        _context5.next = 6;
+                        return authUserArg(args);
+
+                    case 6:
+                        user = _context5.sent;
+                        errors = [];
+
+                        if (user == null) errors.push(_ptzUserDomain.allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);else authToken = encodeArgs(user);
+                        return _context5.abrupt('return', Promise.resolve({
+                            authToken: authToken,
+                            user: user,
+                            errors: errors
+                        }));
+
+                    case 10:
+                    case 'end':
+                        return _context5.stop();
+                }
+            }
+        }, _callee5, undefined);
+    }));
+
+    return function (_x9, _x10, _x11, _x12) {
+        return _ref5.apply(this, arguments);
+    };
+}());
 // tslint:disable-next-line:max-line-length
-var verifyAuthToken = exports.verifyAuthToken = _ramda2.default.curry(function (userRepository, args) {
-    var user = (0, _jwtSimple.decode)(args.token, passwordSalt);
+var verifyAuthToken = exports.verifyAuthToken = _ramda2.default.curry(function (decodeArgs, args) {
+    var user = decodeArgs(args.token);
     return Promise.resolve(user);
 });
-var seed = exports.seed = _ramda2.default.curry(function (repository, authedUser) {
+var seed = exports.seed = _ramda2.default.curry(function (userRepository, authedUser) {
     var users = _ptzUserDomain.users.allUsers;
     users.forEach(function () {
-        var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(user) {
-            return regeneratorRuntime.wrap(function _callee5$(_context5) {
+        var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(user) {
+            return regeneratorRuntime.wrap(function _callee6$(_context6) {
                 while (1) {
-                    switch (_context5.prev = _context5.next) {
+                    switch (_context6.prev = _context6.next) {
                         case 0:
-                            _context5.next = 2;
-                            return saveUser(repository, { userArgs: user, authedUser: authedUser });
+                            _context6.next = 2;
+                            return saveUser({ userRepository: userRepository }, { userArgs: user, authedUser: authedUser });
 
                         case 2:
-                            return _context5.abrupt('return', _context5.sent);
+                            return _context6.abrupt('return', _context6.sent);
 
                         case 3:
                         case 'end':
-                            return _context5.stop();
+                            return _context6.stop();
                     }
                 }
-            }, _callee5, undefined);
+            }, _callee6, undefined);
         }));
 
-        return function (_x8) {
-            return _ref5.apply(this, arguments);
+        return function (_x13) {
+            return _ref6.apply(this, arguments);
         };
     }());
     return Promise.resolve(true);
