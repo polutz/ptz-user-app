@@ -11,11 +11,17 @@ var entities = exports.entities = [];
 var createUserRepoFake = exports.createUserRepoFake = function createUserRepoFake() {
     exports.entities = entities = [];
     var repo = (0, _ptzCoreApp.createRepository)('collectionFake', 'urlFake');
-    // tslint:disable-next-line:no-string-literal
-    repo['getByUserNameOrEmail'] = getByUserNameOrEmail;
-    // tslint:disable-next-line:no-string-literal
-    repo['getOtherUsersWithSameUserNameOrEmail'] = getOtherUsersWithSameUserNameOrEmail;
-    return repo;
+    return {
+        collectionName: repo.collectionName,
+        db: repo.db,
+        save: repo.save,
+        find: repo.find,
+        getById: repo.getById,
+        getByIds: repo.getByIds,
+        getByUserNameOrEmail: getByUserNameOrEmail,
+        getDbCollection: repo.getDbCollection,
+        getOtherUsersWithSameUserNameOrEmail: getOtherUsersWithSameUserNameOrEmail
+    };
 };
 var getOtherUsersWithSameUserNameOrEmail = exports.getOtherUsersWithSameUserNameOrEmail = function getOtherUsersWithSameUserNameOrEmail(user) {
     return Promise.resolve(entities);

@@ -1,10 +1,11 @@
+import { allErrors, createUser, otherUsersWithSameUserNameOrEmail, updateUser } from '@alanmarcell/ptz-user-domain';
 import dotenv from 'dotenv';
-dotenv.config();
 import { contains, emptyArray, equal, notEmptyArray, notOk, ok } from 'ptz-assert';
-import { allErrors, createUser } from '@alanmarcell/ptz-user-domain';
+import { isValid } from 'ptz-validations';
 import { spy, stub } from 'sinon';
-import { createApp } from './index';
+import { createApp, hashPassword, pHash, saveUser as save } from './index';
 import { createUserRepoFake } from './UserRepositoryFake';
+dotenv.config();
 const authedUser = {
     dtCreated: new Date(),
     ip: '192.161.0.1'
@@ -12,10 +13,18 @@ const authedUser = {
 const calledOnce = 'calledOnce', notCalled = 'notCalled';
 var userRepository;
 var userApp;
+const passwordSalt = process.env.PASSWORD_SALT;
+var saveUser;
 beforeEach(() => {
     userRepository = createUserRepoFake();
     spy(userRepository, 'save');
     stub(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
+    saveUser = save({
+        userRepository,
+        hashPass: hashPassword(pHash(passwordSalt)),
+        isValid,
+        updateUser, otherUsersWithSameUserNameOrEmail
+    });
     userApp = createApp({ userRepository });
 });
 describe('UserApp', () => {
@@ -28,7 +37,7 @@ describe('UserApp', () => {
                     displayName: 'Ângelo Ocanã',
                     password: 'testPassword'
                 };
-                const user = await userApp.saveUser({ userArgs, authedUser });
+                const user = await saveUser({ userArgs, authedUser });
                 ok(user.passwordHash, 'passwordHash not set');
                 notOk(user.password, 'password not empty');
             });
@@ -38,7 +47,7 @@ describe('UserApp', () => {
                     email: '',
                     displayName: ''
                 };
-                await userApp.saveUser({ userArgs, authedUser });
+                await saveUser({ userArgs, authedUser });
                 ok(userRepository.save[notCalled]);
             });
             it('call repository if User is valid', async () => {
@@ -47,7 +56,7 @@ describe('UserApp', () => {
                     email: 'angeloocana@gmail.com',
                     displayName: 'Angelo Ocana'
                 };
-                await userApp.saveUser({ userArgs, authedUser });
+                await saveUser({ userArgs, authedUser });
                 ok(userRepository.save[calledOnce]);
             });
             it('set createdBy', async () => {
@@ -56,7 +65,7 @@ describe('UserApp', () => {
                     email: 'angeloocana@gmail.com',
                     displayName: ''
                 };
-                const user = await userApp.saveUser({ userArgs, authedUser });
+                const user = await saveUser({ userArgs, authedUser });
                 equal(user.createdBy, authedUser);
             });
         });
@@ -75,7 +84,7 @@ describe('UserApp', () => {
                     email: 'angeloocana@gmail.com',
                     displayName: 'Angelo Ocana Updated'
                 };
-                const userSaved = await userApp.saveUser({ userArgs, authedUser });
+                const userSaved = await saveUser({ userArgs, authedUser });
                 ok(userRepository.save[calledOnce]);
                 equal(userSaved.displayName, userArgs.displayName);
             });
@@ -118,8 +127,9 @@ describe('UserApp', () => {
                 displayName: 'Angelo Ocana',
                 password
             });
-            user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
+            userApp = createApp({ userRepository });
+            user = await userApp.hashPassword(user);
             user = await userApp.authUser({
                 form: {
                     userNameOrEmail: user.userName,
@@ -141,8 +151,6 @@ describe('UserApp', () => {
                 },
                 authedUser
             });
-            // console.log('\n\n\nauthToken');
-            // console.log(authToken);
             ok(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
             notOk(authToken.authToken, 'Do NOT Generate token');
             notOk(authToken.user, 'DO NOT return user');
@@ -168,8 +176,9 @@ describe('UserApp', () => {
                 email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
                 password: '123456'
             });
-            user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
+            userApp = createApp({ userRepository });
+            user = await userApp.hashPassword(user);
             const authToken = await userApp.getAuthToken({
                 form: {
                     userNameOrEmail: 'lnsilva',
@@ -217,8 +226,9 @@ describe('UserApp', () => {
                 displayName: 'Lucas Neris',
                 password: '123456'
             });
-            user = await userApp.hashPassword(user);
             stub(userRepository, 'getByUserNameOrEmail').returns(user);
+            userApp = createApp({ userRepository });
+            user = await userApp.hashPassword(user);
             const authToken = await userApp.getAuthToken({
                 form: {
                     userNameOrEmail: 'lnsilva',
@@ -253,18 +263,22 @@ describe('UserApp', () => {
         it('delete');
     });
     describe('findUsers', () => {
-        it('call repository', () => {
-            const dbUsers = [];
+        it('call repository', async () => {
+            const dbUsers = [{ name: 'teste' }];
             stub(userRepository, 'find').returns(dbUsers);
+            userApp = createApp({ userRepository });
             const query = {};
             const options = { limit: 4 };
-            const users = userApp.findUsers({ authedUser, options, query });
+            const users = await userApp.findUsers({ authedUser, options, query });
             ok(userRepository.find[calledOnce]);
             equal(users, dbUsers, 'users not returned');
         });
     });
     describe('seed', () => {
-        it('default users');
+        it.skip('default users', async () => {
+            const seeded = await userApp.seed(authedUser);
+            ok(seeded);
+        });
         it('custom users');
     });
 });

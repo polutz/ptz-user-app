@@ -1,12 +1,14 @@
 'use strict';
 
+var _ptzUserDomain = require('@alanmarcell/ptz-user-domain');
+
 var _dotenv = require('dotenv');
 
 var _dotenv2 = _interopRequireDefault(_dotenv);
 
 var _ptzAssert = require('ptz-assert');
 
-var _ptzUserDomain = require('@alanmarcell/ptz-user-domain');
+var _ptzValidations = require('ptz-validations');
 
 var _sinon = require('sinon');
 
@@ -19,7 +21,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 _dotenv2.default.config();
-
 var authedUser = {
     dtCreated: new Date(),
     ip: '192.161.0.1'
@@ -28,10 +29,18 @@ var calledOnce = 'calledOnce',
     notCalled = 'notCalled';
 var userRepository;
 var userApp;
+var passwordSalt = process.env.PASSWORD_SALT;
+var saveUser;
 beforeEach(function () {
     userRepository = (0, _UserRepositoryFake.createUserRepoFake)();
     (0, _sinon.spy)(userRepository, 'save');
     (0, _sinon.stub)(userRepository, 'getOtherUsersWithSameUserNameOrEmail').returns([]);
+    saveUser = (0, _index.saveUser)({
+        userRepository: userRepository,
+        hashPass: (0, _index.hashPassword)((0, _index.pHash)(passwordSalt)),
+        isValid: _ptzValidations.isValid,
+        updateUser: _ptzUserDomain.updateUser, otherUsersWithSameUserNameOrEmail: _ptzUserDomain.otherUsersWithSameUserNameOrEmail
+    });
     userApp = (0, _index.createApp)({ userRepository: userRepository });
 });
 describe('UserApp', function () {
@@ -50,7 +59,7 @@ describe('UserApp', function () {
                                     password: 'testPassword'
                                 };
                                 _context.next = 3;
-                                return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
+                                return saveUser({ userArgs: userArgs, authedUser: authedUser });
 
                             case 3:
                                 user = _context.sent;
@@ -77,7 +86,7 @@ describe('UserApp', function () {
                                     displayName: ''
                                 };
                                 _context2.next = 3;
-                                return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
+                                return saveUser({ userArgs: userArgs, authedUser: authedUser });
 
                             case 3:
                                 (0, _ptzAssert.ok)(userRepository.save[notCalled]);
@@ -101,7 +110,7 @@ describe('UserApp', function () {
                                     displayName: 'Angelo Ocana'
                                 };
                                 _context3.next = 3;
-                                return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
+                                return saveUser({ userArgs: userArgs, authedUser: authedUser });
 
                             case 3:
                                 (0, _ptzAssert.ok)(userRepository.save[calledOnce]);
@@ -125,7 +134,7 @@ describe('UserApp', function () {
                                     displayName: ''
                                 };
                                 _context4.next = 3;
-                                return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
+                                return saveUser({ userArgs: userArgs, authedUser: authedUser });
 
                             case 3:
                                 user = _context4.sent;
@@ -162,7 +171,7 @@ describe('UserApp', function () {
                                     displayName: 'Angelo Ocana Updated'
                                 };
                                 _context5.next = 5;
-                                return userApp.saveUser({ userArgs: userArgs, authedUser: authedUser });
+                                return saveUser({ userArgs: userArgs, authedUser: authedUser });
 
                             case 5:
                                 userSaved = _context5.sent;
@@ -261,14 +270,15 @@ describe('UserApp', function () {
                                 displayName: 'Angelo Ocana',
                                 password: password
                             });
-                            _context8.next = 4;
-                            return userApp.hashPassword(user);
-
-                        case 4:
-                            user = _context8.sent;
 
                             (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
-                            _context8.next = 8;
+                            userApp = (0, _index.createApp)({ userRepository: userRepository });
+                            _context8.next = 6;
+                            return userApp.hashPassword(user);
+
+                        case 6:
+                            user = _context8.sent;
+                            _context8.next = 9;
                             return userApp.authUser({
                                 form: {
                                     userNameOrEmail: user.userName,
@@ -277,13 +287,13 @@ describe('UserApp', function () {
                                 authedUser: authedUser
                             });
 
-                        case 8:
+                        case 9:
                             user = _context8.sent;
 
                             (0, _ptzAssert.ok)(user);
                             (0, _ptzAssert.emptyArray)(user.errors);
 
-                        case 11:
+                        case 12:
                         case 'end':
                             return _context8.stop();
                     }
@@ -311,8 +321,6 @@ describe('UserApp', function () {
                         case 3:
                             authToken = _context9.sent;
 
-                            // console.log('\n\n\nauthToken');
-                            // console.log(authToken);
                             (0, _ptzAssert.ok)(userRepository.getByUserNameOrEmail[notCalled], 'Do NOT call repository getByUserNameOrEmail()');
                             (0, _ptzAssert.notOk)(authToken.authToken, 'Do NOT Generate token');
                             (0, _ptzAssert.notOk)(authToken.user, 'DO NOT return user');
@@ -367,14 +375,15 @@ describe('UserApp', function () {
                                 email: 'lucas.neris@globalpoints.com.br', displayName: 'Lucas Neris',
                                 password: '123456'
                             });
-                            _context11.next = 3;
-                            return userApp.hashPassword(user);
-
-                        case 3:
-                            user = _context11.sent;
 
                             (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
-                            _context11.next = 7;
+                            userApp = (0, _index.createApp)({ userRepository: userRepository });
+                            _context11.next = 5;
+                            return userApp.hashPassword(user);
+
+                        case 5:
+                            user = _context11.sent;
+                            _context11.next = 8;
                             return userApp.getAuthToken({
                                 form: {
                                     userNameOrEmail: 'lnsilva',
@@ -383,7 +392,7 @@ describe('UserApp', function () {
                                 authedUser: authedUser
                             });
 
-                        case 7:
+                        case 8:
                             authToken = _context11.sent;
 
                             (0, _ptzAssert.ok)(authToken.authToken, 'Empty Token');
@@ -391,7 +400,7 @@ describe('UserApp', function () {
                             (0, _ptzAssert.ok)(authToken.user.id, 'no user id');
                             (0, _ptzAssert.emptyArray)(authToken.errors, 'return errors');
 
-                        case 12:
+                        case 13:
                         case 'end':
                             return _context11.stop();
                     }
@@ -476,14 +485,15 @@ describe('UserApp', function () {
                                 displayName: 'Lucas Neris',
                                 password: '123456'
                             });
-                            _context14.next = 3;
-                            return userApp.hashPassword(user);
-
-                        case 3:
-                            user = _context14.sent;
 
                             (0, _sinon.stub)(userRepository, 'getByUserNameOrEmail').returns(user);
-                            _context14.next = 7;
+                            userApp = (0, _index.createApp)({ userRepository: userRepository });
+                            _context14.next = 5;
+                            return userApp.hashPassword(user);
+
+                        case 5:
+                            user = _context14.sent;
+                            _context14.next = 8;
                             return userApp.getAuthToken({
                                 form: {
                                     userNameOrEmail: 'lnsilva',
@@ -492,17 +502,17 @@ describe('UserApp', function () {
                                 authedUser: authedUser
                             });
 
-                        case 7:
+                        case 8:
                             authToken = _context14.sent;
 
                             (0, _ptzAssert.ok)(authToken.authToken, 'Empty Token');
-                            _context14.next = 11;
+                            _context14.next = 12;
                             return userApp.verifyAuthToken({
                                 token: authToken.authToken,
                                 authedUser: authedUser
                             });
 
-                        case 11:
+                        case 12:
                             userByToken = _context14.sent;
 
                             (0, _ptzAssert.equal)(userByToken.id, user.id, 'User Id dont match');
@@ -510,7 +520,7 @@ describe('UserApp', function () {
                             (0, _ptzAssert.equal)(userByToken.userName, user.userName, 'User Id dont match');
                             (0, _ptzAssert.equal)(userByToken.displayName, user.displayName, 'User Id dont match');
 
-                        case 16:
+                        case 17:
                         case 'end':
                             return _context14.stop();
                     }
@@ -534,18 +544,57 @@ describe('UserApp', function () {
         it('delete');
     });
     describe('findUsers', function () {
-        it('call repository', function () {
-            var dbUsers = [];
-            (0, _sinon.stub)(userRepository, 'find').returns(dbUsers);
-            var query = {};
-            var options = { limit: 4 };
-            var users = userApp.findUsers({ authedUser: authedUser, options: options, query: query });
-            (0, _ptzAssert.ok)(userRepository.find[calledOnce]);
-            (0, _ptzAssert.equal)(users, dbUsers, 'users not returned');
-        });
+        it('call repository', _asyncToGenerator(regeneratorRuntime.mark(function _callee15() {
+            var dbUsers, query, options, users;
+            return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                while (1) {
+                    switch (_context15.prev = _context15.next) {
+                        case 0:
+                            dbUsers = [{ name: 'teste' }];
+
+                            (0, _sinon.stub)(userRepository, 'find').returns(dbUsers);
+                            userApp = (0, _index.createApp)({ userRepository: userRepository });
+                            query = {};
+                            options = { limit: 4 };
+                            _context15.next = 7;
+                            return userApp.findUsers({ authedUser: authedUser, options: options, query: query });
+
+                        case 7:
+                            users = _context15.sent;
+
+                            (0, _ptzAssert.ok)(userRepository.find[calledOnce]);
+                            (0, _ptzAssert.equal)(users, dbUsers, 'users not returned');
+
+                        case 10:
+                        case 'end':
+                            return _context15.stop();
+                    }
+                }
+            }, _callee15, undefined);
+        })));
     });
     describe('seed', function () {
-        it('default users');
+        it.skip('default users', _asyncToGenerator(regeneratorRuntime.mark(function _callee16() {
+            var seeded;
+            return regeneratorRuntime.wrap(function _callee16$(_context16) {
+                while (1) {
+                    switch (_context16.prev = _context16.next) {
+                        case 0:
+                            _context16.next = 2;
+                            return userApp.seed(authedUser);
+
+                        case 2:
+                            seeded = _context16.sent;
+
+                            (0, _ptzAssert.ok)(seeded);
+
+                        case 4:
+                        case 'end':
+                            return _context16.stop();
+                    }
+                }
+            }, _callee16, undefined);
+        })));
         it('custom users');
     });
 });

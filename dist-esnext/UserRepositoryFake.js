@@ -3,11 +3,17 @@ export let entities = [];
 export const createUserRepoFake = () => {
     entities = [];
     const repo = createRepository('collectionFake', 'urlFake');
-    // tslint:disable-next-line:no-string-literal
-    repo['getByUserNameOrEmail'] = getByUserNameOrEmail;
-    // tslint:disable-next-line:no-string-literal
-    repo['getOtherUsersWithSameUserNameOrEmail'] = getOtherUsersWithSameUserNameOrEmail;
-    return repo;
+    return {
+        collectionName: repo.collectionName,
+        db: repo.db,
+        save: repo.save,
+        find: repo.find,
+        getById: repo.getById,
+        getByIds: repo.getByIds,
+        getByUserNameOrEmail,
+        getDbCollection: repo.getDbCollection,
+        getOtherUsersWithSameUserNameOrEmail
+    };
 };
 export const getOtherUsersWithSameUserNameOrEmail = (user) => {
     return Promise.resolve(entities);
