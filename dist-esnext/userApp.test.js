@@ -1,9 +1,9 @@
-import { allErrors, createUser, otherUsersWithSameUserNameOrEmail, updateUser } from '@alanmarcell/ptz-user-domain';
+import { allErrors, authUserForm, createUser, otherUsersWithSameUserNameOrEmail, updateUser } from '@alanmarcell/ptz-user-domain';
 import dotenv from 'dotenv';
 import { contains, emptyArray, equal, notEmptyArray, notOk, ok } from 'ptz-assert';
 import { isValid } from 'ptz-validations';
 import { spy, stub } from 'sinon';
-import { createApp, hashPassword, pHash, saveUser as save } from './index';
+import { authUser, createApp, getAuthToken, hashPassword, pEcode, pHash, saveUser as save, tokenSecret } from './index';
 import { createUserRepoFake } from './UserRepositoryFake';
 dotenv.config();
 const authedUser = {
@@ -37,6 +37,7 @@ describe('UserApp', () => {
                     displayName: 'Ângelo Ocanã',
                     password: 'testPassword'
                 };
+                saveUser = save({ userRepository });
                 const user = await saveUser({ userArgs, authedUser });
                 ok(user.passwordHash, 'passwordHash not set');
                 notOk(user.password, 'password not empty');
@@ -144,7 +145,11 @@ describe('UserApp', () => {
     describe('getAuthToken', () => {
         it('add errors when invalid userName or Email', async () => {
             spy(userRepository, 'getByUserNameOrEmail');
-            const authToken = await userApp.getAuthToken({
+            const authToken = await getAuthToken({
+                authUserForm,
+                authUser,
+                encode: pEcode(tokenSecret)
+            }, {
                 form: {
                     userNameOrEmail: 'ln',
                     password: 'testtest'

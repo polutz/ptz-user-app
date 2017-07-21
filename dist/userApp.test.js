@@ -58,16 +58,18 @@ describe('UserApp', function () {
                                     displayName: 'Ângelo Ocanã',
                                     password: 'testPassword'
                                 };
-                                _context.next = 3;
+
+                                saveUser = (0, _index.saveUser)({ userRepository: userRepository });
+                                _context.next = 4;
                                 return saveUser({ userArgs: userArgs, authedUser: authedUser });
 
-                            case 3:
+                            case 4:
                                 user = _context.sent;
 
                                 (0, _ptzAssert.ok)(user.passwordHash, 'passwordHash not set');
                                 (0, _ptzAssert.notOk)(user.password, 'password not empty');
 
-                            case 6:
+                            case 7:
                             case 'end':
                                 return _context.stop();
                         }
@@ -310,7 +312,11 @@ describe('UserApp', function () {
                         case 0:
                             (0, _sinon.spy)(userRepository, 'getByUserNameOrEmail');
                             _context9.next = 3;
-                            return userApp.getAuthToken({
+                            return (0, _index.getAuthToken)({
+                                authUserForm: _ptzUserDomain.authUserForm,
+                                authUser: _index.authUser,
+                                encode: (0, _index.pEcode)(_index.tokenSecret)
+                            }, {
                                 form: {
                                     userNameOrEmail: 'ln',
                                     password: 'testtest'

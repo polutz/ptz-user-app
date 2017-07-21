@@ -18,25 +18,22 @@ import {
     updateUser as updateUserFunc,
     users as usersToSeed
 } from '@alanmarcell/ptz-user-domain';
-
-import * as V from 'ptz-validations';
-
 import { compare, hash } from 'bcryptjs';
+import dotenv from 'dotenv';
 import { decode, encode } from 'jwt-simple';
+// import { log } from 'ptz-log';
+import * as V from 'ptz-validations';
 import R from 'ramda';
+dotenv.config();
 
 export let tokenSecret = process.env.PASSWORD_SALT;
 export let passwordSalt = process.env.PASSWORD_SALT;
-const getSalt = () => {
-    tokenSecret = process.env.PASSWORD_SALT;
-    passwordSalt = process.env.PASSWORD_SALT;
-};
+
 export const pHash = R.curry((secret: string) => (user: string) => hash(user, secret));
 export const pEcode = R.curry((secret: string) => (user: IUser) => encode(user, secret));
 export const pDecode = R.curry((secret: string) => (user: IUser) => decode(user, secret));
 
 export const createApp = (userAppArgs: IUserAppArgs): IUserApp => {
-    getSalt();
     const userRepository = userAppArgs.userRepository;
     return {
         saveUser: saveUser({
@@ -46,11 +43,14 @@ export const createApp = (userAppArgs: IUserAppArgs): IUserApp => {
             isValid: V.isValid,
             updateUser: updateUserFunc,
             otherUsersWithSameUserNameOrEmail
-        }
-        ),
+        }),
         findUsers: findUsers(userRepository.find),
         authUser: authUser(userRepository.getByUserNameOrEmail),
-        getAuthToken: getAuthToken(authUserForm, authUser(userRepository.getByUserNameOrEmail), pEcode(tokenSecret)),
+        getAuthToken: getAuthToken({
+            authUserForm,
+            authUser: authUser(userRepository.getByUserNameOrEmail),
+            encode: pEcode(tokenSecret)
+        }),
         verifyAuthToken: verifyAuthToken(pDecode(tokenSecret)),
         updatePassword,
         updatePasswordToken,
@@ -79,27 +79,30 @@ export const saveUser = R.curry(async (func: {
 },
                                        args: ISaveUserArgs): Promise<IUser> => {
     args.userArgs.createdBy = args.authedUser;
+    const user = func.createUser ? func.createUser(args.userArgs) : createUser(args.userArgs);
 
-    var user = func.createUser ? func.createUser(args.userArgs) : createUser(args.userArgs);
+    const userHash = func.hashPass ? await func.hashPass(user) : await hashPassword(pHash(tokenSecret), user);
 
-    user = await func.hashPass(user);
-    if (!func.isValid(user))
-        return Promise.resolve(user);
+    if (func.isValid ? !func.isValid(userHash) : !V.isValid(userHash))
+        return Promise.resolve(userHash);
 
-    const otherUsers = await func.userRepository.getOtherUsersWithSameUserNameOrEmail(user) ;
+    const otherUsers = await func.userRepository.getOtherUsersWithSameUserNameOrEmail(userHash);
 
-    user = func.otherUsersWithSameUserNameOrEmail(user, otherUsers);
+    var userWithOtherUsers = func.otherUsersWithSameUserNameOrEmail ?
+        func.otherUsersWithSameUserNameOrEmail(userHash, otherUsers) :
+        otherUsersWithSameUserNameOrEmail(userHash, otherUsers);
 
-    if (!V.isValid(user))
-        return Promise.resolve(user);
+    if (func.isValid ? !func.isValid(userWithOtherUsers) : !V.isValid(userWithOtherUsers))
+        return Promise.resolve(userWithOtherUsers);
 
-    const userDb = await func.userRepository.getById(user.id);
+    const userDb = await func.userRepository.getById(userWithOtherUsers.id);
 
-    if (userDb) user = func.updateUser(userDb, user);
+    if (userDb) userWithOtherUsers = func.updateUser ?
+        func.updateUser(userDb, userWithOtherUsers) :
+        updateUserFunc(userDb, userWithOtherUsers);
 
-    user = await func.userRepository.save(user);
-
-    return Promise.resolve(user);
+    const savedUser = await func.userRepository.save(userWithOtherUsers);
+    return Promise.resolve(savedUser);
 });
 
 // tslint:disable-next-line:max-line-length
@@ -110,7 +113,6 @@ export const authUser = R.curry(async (getByUserNameOrEmail: (userNameOrEmail: s
                                        args: IAuthUserArgs) => {
     const { form } = args;
     const user = await getByUserNameOrEmail(form.userNameOrEmail);
-
     if (!user) return Promise.resolve(null);
 
     const isPasswordCorrect = await compare(form.password, user.passwordHash);
@@ -118,9 +120,14 @@ export const authUser = R.curry(async (getByUserNameOrEmail: (userNameOrEmail: s
     return Promise.resolve(isPasswordCorrect ? user : null);
 });
 
-export const getAuthToken = R.curry(async (authUserFormArg, authUserArg: any, encodeArgs, args: IAuthUserArgs):
+export const getAuthToken = R.curry(async (func: {
+    authUserForm,
+    authUser: any,
+    encode
+},
+                                           args: IAuthUserArgs):
     Promise<IAuthToken> => {
-    const form = authUserFormArg(args.form);
+    const form = func.authUserForm(args.form);
 
     var authToken = null;
 
@@ -130,11 +137,10 @@ export const getAuthToken = R.curry(async (authUserFormArg, authUserArg: any, en
             user: null,
             errors: form.errors
         });
-
-    const user = await authUserArg(args);
+    const user = await func.authUser(args);
     const errors = [];
     if (user == null) errors.push(allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);
-    else authToken = encodeArgs(user);
+    else authToken = func.encode(user);
 
     return Promise.resolve({
         authToken,
@@ -153,7 +159,7 @@ export const seed = R.curry((userRepository: IUserRepository, authedUser: ICreat
 
     const users: IUser[] = usersToSeed.allUsers;
 
-    users.forEach(async user => await saveUser({userRepository}, { userArgs: user, authedUser }));
+    users.forEach(async user => await saveUser({ userRepository }, { userArgs: user, authedUser }));
 
     return Promise.resolve(true);
 });
