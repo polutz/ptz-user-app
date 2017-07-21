@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.deleteUser = exports.updatePasswordToken = exports.updatePassword = exports.seed = exports.verifyAuthToken = exports.getAuthToken = exports.authUser = exports.findUsers = exports.saveUser = exports.hashPassword = exports.createApp = exports.pDecode = exports.pEcode = exports.pHash = exports.passwordSalt = exports.tokenSecret = undefined;
+exports.deleteUser = exports.updatePasswordToken = exports.updatePassword = exports.seed = exports.verifyAuthToken = exports.getAuthToken = exports.authUser = exports.findUsers = exports.saveUser = exports.hashPassword = exports.createApp = exports.cDecode = exports.cEncode = exports.pHash = exports.passwordSalt = exports.tokenSecret = undefined;
 
 var _ptzUserDomain = require('@alanmarcell/ptz-user-domain');
 
@@ -39,12 +39,12 @@ var pHash = exports.pHash = _ramda2.default.curry(function (secret) {
         return (0, _bcryptjs.hash)(user, secret);
     };
 });
-var pEcode = exports.pEcode = _ramda2.default.curry(function (secret) {
+var cEncode = exports.cEncode = _ramda2.default.curry(function (secret) {
     return function (user) {
         return (0, _jwtSimple.encode)(user, secret);
     };
 });
-var pDecode = exports.pDecode = _ramda2.default.curry(function (secret) {
+var cDecode = exports.cDecode = _ramda2.default.curry(function (secret) {
     return function (user) {
         return (0, _jwtSimple.decode)(user, secret);
     };
@@ -65,9 +65,9 @@ var createApp = exports.createApp = function createApp(userAppArgs) {
         getAuthToken: getAuthToken({
             authUserForm: _ptzUserDomain.authUserForm,
             authUser: authUser(userRepository.getByUserNameOrEmail),
-            encode: pEcode(tokenSecret)
+            encode: cEncode(tokenSecret)
         }),
-        verifyAuthToken: verifyAuthToken(pDecode(tokenSecret)),
+        verifyAuthToken: verifyAuthToken(cDecode(tokenSecret)),
         updatePassword: updatePassword,
         updatePasswordToken: updatePasswordToken,
         deleteUser: deleteUser,

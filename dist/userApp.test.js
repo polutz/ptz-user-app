@@ -315,7 +315,7 @@ describe('UserApp', function () {
                             return (0, _index.getAuthToken)({
                                 authUserForm: _ptzUserDomain.authUserForm,
                                 authUser: _index.authUser,
-                                encode: (0, _index.pEcode)(_index.tokenSecret)
+                                encode: (0, _index.cEncode)(_index.tokenSecret)
                             }, {
                                 form: {
                                     userNameOrEmail: 'ln',

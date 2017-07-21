@@ -6,7 +6,8 @@ import dotenv from 'dotenv';
 import { contains, emptyArray, equal, notEmptyArray, notOk, ok } from 'ptz-assert';
 import { isValid } from 'ptz-validations';
 import { spy, stub } from 'sinon';
-import { authUser, createApp, getAuthToken, hashPassword, pEcode, pHash, saveUser as save, tokenSecret } from './index';
+import { authUser,
+    cEncode, createApp, getAuthToken, hashPassword, pHash, saveUser as save, tokenSecret } from './index';
 import { createUserRepoFake } from './UserRepositoryFake';
 
 dotenv.config();
@@ -187,7 +188,7 @@ describe('UserApp', () => {
             const authToken = await getAuthToken({
                 authUserForm,
                 authUser,
-                encode: pEcode(tokenSecret)
+                encode: cEncode(tokenSecret)
             },
                 {
                     form: {

@@ -30,8 +30,8 @@ export let tokenSecret = process.env.PASSWORD_SALT;
 export let passwordSalt = process.env.PASSWORD_SALT;
 
 export const pHash = R.curry((secret: string) => (user: string) => hash(user, secret));
-export const pEcode = R.curry((secret: string) => (user: IUser) => encode(user, secret));
-export const pDecode = R.curry((secret: string) => (user: IUser) => decode(user, secret));
+export const cEncode = R.curry((secret: string) => (user: IUser) => encode(user, secret));
+export const cDecode = R.curry((secret: string) => (user: IUser) => decode(user, secret));
 
 export const createApp = (userAppArgs: IUserAppArgs): IUserApp => {
     const userRepository = userAppArgs.userRepository;
@@ -49,9 +49,9 @@ export const createApp = (userAppArgs: IUserAppArgs): IUserApp => {
         getAuthToken: getAuthToken({
             authUserForm,
             authUser: authUser(userRepository.getByUserNameOrEmail),
-            encode: pEcode(tokenSecret)
+            encode: cEncode(tokenSecret)
         }),
-        verifyAuthToken: verifyAuthToken(pDecode(tokenSecret)),
+        verifyAuthToken: verifyAuthToken(cDecode(tokenSecret)),
         updatePassword,
         updatePasswordToken,
         deleteUser,

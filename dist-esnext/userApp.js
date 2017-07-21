@@ -9,8 +9,8 @@ dotenv.config();
 export let tokenSecret = process.env.PASSWORD_SALT;
 export let passwordSalt = process.env.PASSWORD_SALT;
 export const pHash = R.curry((secret) => (user) => hash(user, secret));
-export const pEcode = R.curry((secret) => (user) => encode(user, secret));
-export const pDecode = R.curry((secret) => (user) => decode(user, secret));
+export const cEncode = R.curry((secret) => (user) => encode(user, secret));
+export const cDecode = R.curry((secret) => (user) => decode(user, secret));
 export const createApp = (userAppArgs) => {
     const userRepository = userAppArgs.userRepository;
     return {
@@ -27,9 +27,9 @@ export const createApp = (userAppArgs) => {
         getAuthToken: getAuthToken({
             authUserForm,
             authUser: authUser(userRepository.getByUserNameOrEmail),
-            encode: pEcode(tokenSecret)
+            encode: cEncode(tokenSecret)
         }),
-        verifyAuthToken: verifyAuthToken(pDecode(tokenSecret)),
+        verifyAuthToken: verifyAuthToken(cDecode(tokenSecret)),
         updatePassword,
         updatePasswordToken,
         deleteUser,
