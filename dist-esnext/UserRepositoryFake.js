@@ -1,4 +1,4 @@
-import { createRepository } from '@alanmarcell/ptz-core-app';
+import { createRepository } from 'ptz-core-app';
 export let entities = [];
 export const createUserRepoFake = () => {
     entities = [];

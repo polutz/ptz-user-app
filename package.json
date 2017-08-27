@@ -1,15 +1,15 @@
 {
-  "name": "@alanmarcell/ptz-user-app",
-  "version": "2.0.2",
+  "name": "ptz-user-app",
+  "version": "2.1.0",
   "description": "Polutz User App.",
   "main": "dist/index.js",
   "typings": "src/index.js",
   "scripts": {
     "lint": "tslint ./src/**/*.ts ./src/**/*.test.ts ./src/**/*.d.ts",
-    "js": "rimraf dist-esnext && tsc && rimraf dist && babel dist-esnext -d dist --presets es2015 --source-maps",
+    "js": "rimraf dist-esnext && tsc && rimraf dist && babel dist-esnext -d dist --source-maps",
     "pretest": "npm-run-all --parallel js lint gensalt",
     "mocha": "mocha ./dist/**/*.js --require babel-polyfill",
-    "test": "nyc npm run mocha && nyc report --reporter=html --reporter=text-lcov > coverage.lcov && f() { EXIT=0; codecov --token=b1c7616b-9a84-436e-9329-50273c9d72db || exit $EXIT; }; f",
+    "test": "nyc npm run mocha && nyc report --reporter=html --reporter=text-lcov > coverage.lcov && codecov --token=b1c7616b-9a84-436e-9329-50273c9d72db",
     "test:cover": "npm run test && opn ./coverage/index.html",
     "predebug": "npm run pretest",
     "debug": "node --nolazy --debug-brk=5858 dist/index.js",
@@ -22,38 +22,41 @@
     "url": "git+https://github.com/polutz/ptz-user-app.git"
   },
   "author": "angeloocana.com",
-  "license": "ISC",
+  "contributors": [
+    "Alan Marcell <alanmarcell@live.com> (http://alanmarcell.com.br)"
+  ],
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/polutz/ptz-user-app/issues"
   },
   "homepage": "https://github.com/polutz/ptz-user-app#readme",
   "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-es2017": "^6.24.1",
-    "codecov": "^2.2.0",
+    "@types/mocha": "^2.2.42",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "codecov": "^2.3.0",
     "istanbul": "^0.4.5",
-    "mocha": "^3.4.2",
+    "mocha": "^3.5.0",
     "mocha-lcov-reporter": "^1.3.0",
-    "npm-run-all": "^4.0.2",
-    "nyc": "^11.0.3",
+    "npm-run-all": "^4.1.0",
+    "nyc": "^11.1.0",
     "opn-cli": "^3.1.0",
     "ptz-assert": "^1.6.8",
     "rimraf": "^2.6.1",
-    "sinon": "^2.3.8",
-    "tslint": "^5.5.0",
-    "typedoc": "^0.7.1",
-    "typescript": "^2.4.1"
+    "sinon": "^3.2.1",
+    "tslint": "^5.7.0",
+    "typedoc": "^0.8.0",
+    "typescript": "^2.4.2"
   },
   "dependencies": {
-    "@types/mocha": "^2.2.41",
-    "@types/node": "^8.0.13",
-    "@alanmarcell/ptz-core-app": "^2.0.2",
-    "@alanmarcell/ptz-user-domain": "^2.0.3",
+    "@types/node": "^8.0.25",
+    "ptz-core-domain": "^2.1.0",
     "ptz-validations": "^3.0.1",
+    "ptz-log": "^1.1.0",
+    "ptz-core-app": "^2.1.0",
+    "ptz-user-domain": "^2.1.1",
     "bcryptjs": "^2.4.3",
     "dotenv": "^4.0.0",
-    "jwt-simple": "^0.5.1",
-    "ptz-log": "^1.1.0"
+    "jwt-simple": "^0.5.1"
   }
 }

@@ -5,12 +5,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getByUserNameOrEmail = exports.getOtherUsersWithSameUserNameOrEmail = exports.createUserRepoFake = exports.entities = undefined;
 
-var _ptzCoreApp = require('@alanmarcell/ptz-core-app');
+var _ptzCoreApp = require('ptz-core-app');
 
-var entities = exports.entities = [];
-var createUserRepoFake = exports.createUserRepoFake = function createUserRepoFake() {
+let entities = exports.entities = [];
+const createUserRepoFake = exports.createUserRepoFake = () => {
     exports.entities = entities = [];
-    var repo = (0, _ptzCoreApp.createRepository)('collectionFake', 'urlFake');
+    const repo = (0, _ptzCoreApp.createRepository)('collectionFake', 'urlFake');
     return {
         collectionName: repo.collectionName,
         db: repo.db,
@@ -18,15 +18,15 @@ var createUserRepoFake = exports.createUserRepoFake = function createUserRepoFak
         find: repo.find,
         getById: repo.getById,
         getByIds: repo.getByIds,
-        getByUserNameOrEmail: getByUserNameOrEmail,
+        getByUserNameOrEmail,
         getDbCollection: repo.getDbCollection,
-        getOtherUsersWithSameUserNameOrEmail: getOtherUsersWithSameUserNameOrEmail
+        getOtherUsersWithSameUserNameOrEmail
     };
 };
-var getOtherUsersWithSameUserNameOrEmail = exports.getOtherUsersWithSameUserNameOrEmail = function getOtherUsersWithSameUserNameOrEmail(user) {
+const getOtherUsersWithSameUserNameOrEmail = exports.getOtherUsersWithSameUserNameOrEmail = user => {
     return Promise.resolve(entities);
 };
-var getByUserNameOrEmail = exports.getByUserNameOrEmail = function getByUserNameOrEmail(userNameOrEmail) {
+const getByUserNameOrEmail = exports.getByUserNameOrEmail = userNameOrEmail => {
     return Promise.resolve(entities[0]);
 };
 //# sourceMappingURL=UserRepositoryFake.js.map

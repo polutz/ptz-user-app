@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-var allActions = exports.allActions = {
+const allActions = exports.allActions = {
     SAVE_USER: 'SAVE_USER',
     DELETE_USER: 'DELETE_USER',
     AUTH_USER: 'AUTH_USER',

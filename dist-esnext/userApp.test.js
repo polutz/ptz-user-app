@@ -1,6 +1,6 @@
-import { allErrors, createUser, otherUsersWithSameUserNameOrEmail, updateUser } from '@alanmarcell/ptz-user-domain';
 import dotenv from 'dotenv';
 import { contains, emptyArray, equal, notEmptyArray, notOk, ok } from 'ptz-assert';
+import { allErrors, createUser, otherUsersWithSameUserNameOrEmail, updateUser } from 'ptz-user-domain';
 import { isValid } from 'ptz-validations';
 import { spy, stub } from 'sinon';
 import { createApp, hashPassword, pHash, saveUser as save } from './index';
@@ -275,8 +275,10 @@ describe('UserApp', () => {
         });
     });
     describe('seed', () => {
-        it.skip('default users', async () => {
-            const seeded = await userApp.seed(authedUser);
+        it('default users', async () => {
+            const dbUsers = [{ name: 'teste' }];
+            stub(userRepository, 'find').returns(dbUsers);
+            const seeded = await userApp.seed(userRepository);
             ok(seeded);
         });
         it('custom users');

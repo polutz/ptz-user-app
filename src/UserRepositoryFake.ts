@@ -1,10 +1,10 @@
-import { createRepository } from '@alanmarcell/ptz-core-app';
-import { IUser } from '@alanmarcell/ptz-user-domain';
+import { createRepository } from 'ptz-core-app';
+import { IUser } from 'ptz-user-domain';
 
 export let entities = [];
 export const createUserRepoFake = () => {
     entities = [];
-    const repo = createRepository<IUser>('collectionFake', 'urlFake');
+    const repo = createRepository('collectionFake', 'urlFake');
     return {
         collectionName: repo.collectionName,
         db: repo.db,
