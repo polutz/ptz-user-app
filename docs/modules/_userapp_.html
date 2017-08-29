@@ -105,7 +105,7 @@
 					<div class="tsd-signature tsd-kind-icon">auth<wbr>User<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CurriedFunction2</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IAuthUserArgs</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;R.curry(async (getByUserNameOrEmail: (userNameOrEmail: string) &#x3D;&gt; Promise&lt;IUser&gt;,args: IAuthUserArgs) &#x3D;&gt; {const { form } &#x3D; args;const user &#x3D; await getByUserNameOrEmail(form.userNameOrEmail);if (!user) return Promise.resolve(null);const isPasswordCorrect &#x3D; await compare(form.password, user.passwordHash);return Promise.resolve(isPasswordCorrect ? user : null);})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L112">userApp.ts:112</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L112">userApp.ts:112</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -115,7 +115,7 @@
 					<div class="tsd-signature tsd-kind-icon">c<wbr>Decode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CurriedFunction2</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;R.curry((secret: string) &#x3D;&gt; (user: IUser) &#x3D;&gt; decode(user, secret))</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L34">userApp.ts:34</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L34">userApp.ts:34</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -125,7 +125,7 @@
 					<div class="tsd-signature tsd-kind-icon">c<wbr>Encode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CurriedFunction2</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;R.curry((secret: string) &#x3D;&gt; (user: IUser) &#x3D;&gt; encode(user, secret))</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L33">userApp.ts:33</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L33">userApp.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -135,7 +135,7 @@
 					<div class="tsd-signature tsd-kind-icon">find<wbr>Users<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CurriedFunction2</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IFindUsersArgs</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IUser</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;R.curry(async (find: (query: any, options: { limit: number }) &#x3D;&gt; Promise&lt;IUser[]&gt;, args: IFindUsersArgs) &#x3D;&gt;find(args.query, { limit: args.options.limit }))</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L109">userApp.ts:109</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L109">userApp.ts:109</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -145,7 +145,7 @@
 					<div class="tsd-signature tsd-kind-icon">get<wbr>Auth<wbr>Token<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CurriedFunction2</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IAuthUserArgs</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IAuthToken</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;R.curry(async (func: {authUserForm,authUser: any,encode},args: IAuthUserArgs):Promise&lt;IAuthToken&gt; &#x3D;&gt; {const form &#x3D; func.authUserForm(args.form);var authToken &#x3D; null;if (!V.isValid(form))return Promise.resolve({authToken,user: null,errors: form.errors});const user &#x3D; await func.authUser(args);const errors &#x3D; [];if (user &#x3D;&#x3D; null) errors.push(allErrors.ERROR_USERAPP_GETAUTHTOKEN_INVALID_USERNAME_OR_PASSWORD);else authToken &#x3D; func.encode(user);return Promise.resolve({authToken,user,errors});})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L123">userApp.ts:123</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L123">userApp.ts:123</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -155,7 +155,7 @@
 					<div class="tsd-signature tsd-kind-icon">hash<wbr>Password<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CurriedFunction2</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IUser</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IUser</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;R.curry(async (hashArg: (userPassword: string) &#x3D;&gt; any, user: IUser): Promise&lt;IUser&gt; &#x3D;&gt; {if (!user.password) return Promise.resolve(user);user.passwordHash &#x3D; await hashArg(user.password);user.password &#x3D; undefined;return Promise.resolve(user);})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L63">userApp.ts:63</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L63">userApp.ts:63</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -165,7 +165,7 @@
 					<div class="tsd-signature tsd-kind-icon">p<wbr>Hash<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CurriedFunction2</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;R.curry((secret: string) &#x3D;&gt; (user: string) &#x3D;&gt; hash(user, secret))</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L32">userApp.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L32">userApp.ts:32</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -175,7 +175,7 @@
 					<div class="tsd-signature tsd-kind-icon">password<wbr>Salt<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;process.env.PASSWORD_SALT</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L30">userApp.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L30">userApp.ts:30</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -185,7 +185,7 @@
 					<div class="tsd-signature tsd-kind-icon">save<wbr>User<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CurriedFunction2</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">ISaveUserArgs</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IUser</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;R.curry(async (func: {userRepository: IUserRepository,hashPass?: (u: IUser) &#x3D;&gt; Promise&lt;IUser&gt;,createUser?: (u: IUser) &#x3D;&gt; IUser,isValid?: (user: V.IHaveValidation) &#x3D;&gt; boolean,updateUser?: (dbUser: IUser, user: IUser) &#x3D;&gt; IUser,otherUsersWithSameUserNameOrEmail?: (user: IUser, otherUsers: IUser[]) &#x3D;&gt; IUser},args: ISaveUserArgs): Promise&lt;IUser&gt; &#x3D;&gt; {args.userArgs.createdBy &#x3D; args.authedUser;const user &#x3D; func.createUser ? func.createUser(args.userArgs) : createUser(args.userArgs);const userHash &#x3D; func.hashPass ? await func.hashPass(user) : await hashPassword(pHash(tokenSecret), user);if (func.isValid ? !func.isValid(userHash) : !V.isValid(userHash))return Promise.resolve(userHash);const otherUsers &#x3D; await func.userRepository.getOtherUsersWithSameUserNameOrEmail(userHash);var userWithOtherUsers &#x3D; func.otherUsersWithSameUserNameOrEmail ?func.otherUsersWithSameUserNameOrEmail(userHash, otherUsers) :otherUsersWithSameUserNameOrEmail(userHash, otherUsers);if (func.isValid ? !func.isValid(userWithOtherUsers) : !V.isValid(userWithOtherUsers))return Promise.resolve(userWithOtherUsers);const userDb &#x3D; await func.userRepository.getById(userWithOtherUsers.id);if (userDb) userWithOtherUsers &#x3D; func.updateUser ?func.updateUser(userDb, userWithOtherUsers) :updateUserFunc(userDb, userWithOtherUsers);const savedUser &#x3D; await func.userRepository.save(userWithOtherUsers);return Promise.resolve(savedUser);})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L72">userApp.ts:72</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L72">userApp.ts:72</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -195,7 +195,7 @@
 					<div class="tsd-signature tsd-kind-icon">seed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CurriedFunction2</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IUserRepository</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">ICreatedBy</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IUserForLog</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;R.curry((userRepository: IUserRepository, authedUser: ICreatedBy) &#x3D;&gt; {const users: IUser[] &#x3D; usersToSeed.allUsers;users.forEach(async user &#x3D;&gt; await saveUser({ userRepository }, { userArgs: user, authedUser }));return Promise.resolve(true);})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L158">userApp.ts:158</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L158">userApp.ts:158</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -205,7 +205,7 @@
 					<div class="tsd-signature tsd-kind-icon">token<wbr>Secret<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;process.env.PASSWORD_SALT</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L29">userApp.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L29">userApp.ts:29</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -215,7 +215,7 @@
 					<div class="tsd-signature tsd-kind-icon">verify<wbr>Auth<wbr>Token<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CurriedFunction2</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">IVerifyAuthTokenArgs</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IUser</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;R.curry((decodeArgs: any, args: IVerifyAuthTokenArgs): Promise&lt;IUser&gt; &#x3D;&gt; {const user &#x3D; decodeArgs(args.token);return Promise.resolve(user);})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L153">userApp.ts:153</a></li>
+							<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L153">userApp.ts:153</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -232,7 +232,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L36">userApp.ts:36</a></li>
+									<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L36">userApp.ts:36</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -255,7 +255,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L175">userApp.ts:175</a></li>
+									<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L175">userApp.ts:175</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -278,7 +278,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L167">userApp.ts:167</a></li>
+									<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L167">userApp.ts:167</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -301,7 +301,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/18e7a72/src/userApp.ts#L171">userApp.ts:171</a></li>
+									<li>Defined in <a href="https://github.com/polutz/ptz-user-app/blob/6e17dbd/src/userApp.ts#L171">userApp.ts:171</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>

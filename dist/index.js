@@ -10,7 +10,7 @@ Object.keys(_userApp).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   Object.defineProperty(exports, key, {
     enumerable: true,
-    get: function () {
+    get: function get() {
       return _userApp[key];
     }
   });
@@ -22,7 +22,7 @@ Object.keys(_allActions).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   Object.defineProperty(exports, key, {
     enumerable: true,
-    get: function () {
+    get: function get() {
       return _allActions[key];
     }
   });
@@ -34,7 +34,7 @@ Object.keys(_UserRepositoryFake).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   Object.defineProperty(exports, key, {
     enumerable: true,
-    get: function () {
+    get: function get() {
       return _UserRepositoryFake[key];
     }
   });
